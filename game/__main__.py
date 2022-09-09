@@ -1,16 +1,23 @@
 import asyncio
+import itertools
 
 import pygame
 
+from game.common import SCREEN_SIZE
+from game.states.enums import States
+from game.states.main_menu import MainMenu
+from game.states.world import World
+
 
 class Game:
-    SCREEN_SIZE = 400, 670
     SCREEN_FLAGS = pygame.SCALED
     FPS_CAP = 60
 
     def __init__(self) -> None:
-        self.screen = pygame.display.set_mode(self.SCREEN_SIZE, self.SCREEN_FLAGS)
+        self.screen = pygame.display.set_mode(SCREEN_SIZE, self.SCREEN_FLAGS)
         self.clock = pygame.time.Clock()
+        self.states = itertools.cycle((World, MainMenu))
+        self.state = World()
 
         self._is_running = True
 
@@ -41,8 +48,13 @@ class Game:
             if event.type == pygame.QUIT:
                 self._is_running = False
 
+        self.state.update(event_info)
+        if not self.state.alive:
+            self.state = next(self.states)()
+
     def _draw(self) -> None:
         self.screen.fill("grey")
+        self.state.draw(self.screen)
 
     async def _run(self) -> None:
         while self._is_running:

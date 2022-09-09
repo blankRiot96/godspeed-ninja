@@ -13,10 +13,13 @@ class Entity(abc.ABC):
         self.pos = pos
         self.type = type
 
+    def draw(self, screen: pygame.Surface):
+        screen.blit(self.image, self.pos)
+
 
 class CollidableEntity(Entity):
-    def __init__(self, image: pygame.Surface, pos: Pos) -> None:
-        super().__init__(image, pos)
+    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities) -> None:
+        super().__init__(image, pos, type)
         self.rect = pygame.Rect(pos, self.image.get_size())
         self.colliding_with = None
 

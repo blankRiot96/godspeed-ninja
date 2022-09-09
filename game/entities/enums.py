@@ -2,4 +2,5 @@ import enum
 
 
 class Entities(enum.Enum):
-    pass
+    PLAYER = enum.auto()
+    PLATFORM = enum.auto()
