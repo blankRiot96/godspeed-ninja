@@ -1,7 +1,6 @@
 class ClimbInitStage:
-    pass 
+    pass
 
 
 class Climb:
-    pass 
-
+    pass

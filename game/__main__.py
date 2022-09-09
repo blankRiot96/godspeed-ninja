@@ -1,5 +1,6 @@
-import pygame 
 import asyncio
+
+import pygame
 
 
 class Game:
@@ -38,8 +39,7 @@ class Game:
         event_info = self._grab_events()
         for event in event_info["events"]:
             if event.type == pygame.QUIT:
-                self._is_running = False 
-        
+                self._is_running = False
 
     def _draw(self) -> None:
         self.screen.fill("grey")
@@ -68,4 +68,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
