@@ -11,7 +11,7 @@ class Player(CollidableEntity):
     def __init__(self) -> None:
         super().__init__(
             image=pygame.Surface(self.SIZE),
-            pos=pygame.Vector2(0, 0),
+            pos=pygame.Vector2(50, 0),
             type=Entities.PLAYER,
         )
 

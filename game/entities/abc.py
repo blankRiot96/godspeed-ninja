@@ -31,3 +31,6 @@ class CollidableEntity(Entity):
             self.colliding_with = None
 
         return is_colliding
+
+    def draw(self, screen: pygame.Surface):
+        screen.blit(self.image, self.rect)
