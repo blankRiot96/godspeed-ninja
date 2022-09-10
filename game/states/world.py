@@ -5,7 +5,7 @@ import game.common
 from game.common import SCREEN_SIZE
 from game.entities.enums import Entities
 from game.entities.platform import Platform
-from game.entities.obstacles import Spike
+from game.entities.obstacles import Spike, Shuriken
 from game.entities.player import Player
 
 from library.common import EventInfo
@@ -17,6 +17,7 @@ class WorldInitStage:
         self.player = Player()
         self.platforms: list[Platform] = []
         self.spikes: list[Spike] = []
+        self.shurikens: list[Shuriken] = []
         self.alive = True
 
     def update(self, event_info: EventInfo):
@@ -25,12 +26,39 @@ class WorldInitStage:
     def draw(self, screen: pygame.Surface):
         pass
 
-class SpikeStage(WorldInitStage):
+
+class ShurikenStage(WorldInitStage):
+    def __init__(self) -> None:
+        super().__init__()
+        self.shuriken_gen_time = Time(3.0)
+
+    def update(self, event_info: EventInfo):
+        super().update(event_info)
+        if self.shuriken_gen_time.update():
+            pos_x = random.randrange(50, SCREEN_SIZE[0] - 50)
+            self.shurikens.append(
+                Shuriken(
+                    pygame.Vector2(pos_x, 0)
+                )
+            )
+
+        for shuriken in self.shurikens[:]:
+            shuriken.update(event_info["dt"])
+            if not shuriken.alive:
+                self.shurikens.remove(shuriken)
+
+    def draw(self, screen):
+        super().draw(screen)
+        for shuriken in self.shurikens:
+            shuriken.draw(screen)
+
+class SpikeStage(ShurikenStage):
     def __init__(self) -> None:
         super().__init__()
         self.spike_gen_time = Time(2.5)
 
     def update(self, event_info):
+        super().update(event_info)
         if self.spike_gen_time.update():
             spike_height = 30
             dir = random.choice(("left", "right"))
@@ -44,13 +72,17 @@ class SpikeStage(WorldInitStage):
 
             for x in range(n_spikes):
                 self.spikes.append(
-                    Spike(spike_height, pygame.Vector2(pos_x, x * spike_height), dir)
+                    Spike(spike_height, pygame.Vector2(pos_x, (x * spike_height) - (n_spikes * spike_height)), dir)
                 )
 
-        for spike in self.spikes:
+        for spike in self.spikes[:]:
             spike.update(event_info["dt"])
+
+            if not spike.alive:
+                self.spikes.remove(spike)
     
     def draw(self, screen):
+        super().draw(screen)
         for spike in self.spikes:
             spike.draw(screen)
 
@@ -82,19 +114,19 @@ class ScoreStage(PlayerStage):
 
     def __init__(self) -> None:
         super().__init__()
-        self.score_gen_time = Time(1)
-    
+        self.score_vel = 0.1
+        self.score_acc = 0.001
+
     def update(self, event_info):
         super().update(event_info)
-        if self.score_gen_time.update():
-            game.common.SCORE += 1
-            self.score_gen_time.time_to_pass += 3.3
-        
-        game.common.UNIVERSAL_SPEEDUP = (game.common.SCORE + 1) * 0.7
+        if game.common.SCORE < 150 or game.common.SCORE % 100 == 0:
+            self.score_vel += self.score_acc * event_info["dt"]
+        game.common.SCORE += self.score_vel * event_info["dt"]        
+        game.common.UNIVERSAL_SPEEDUP = self.score_vel * 20
 
     def draw(self, screen):
         super().draw(screen)
-        score_surf = self.SCORE_FONT.render(str(game.common.SCORE), True, "black")
+        score_surf = self.SCORE_FONT.render(f"{game.common.SCORE:.0f}", True, "black")
         score_rect = score_surf.get_rect()
         score_rect.center = screen.get_rect().center
         screen.blit(score_surf, score_rect)

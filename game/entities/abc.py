@@ -3,6 +3,7 @@ import abc
 import pygame
 from library.common import Pos
 from typing_extensions import Self
+from game.common import SCREEN_SIZE
 
 from game.entities.enums import Entities
 
@@ -34,3 +35,13 @@ class CollidableEntity(Entity):
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.image, self.rect)
+
+
+class MovingEntity(CollidableEntity):
+    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities) -> None:
+        super().__init__(image, pos, type)
+        self.alive = True
+
+    def update(self):
+        if self.pos.y > SCREEN_SIZE[1]:
+            self.alive = False 

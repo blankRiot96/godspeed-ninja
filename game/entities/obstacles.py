@@ -1,6 +1,6 @@
 import pygame
 
-from game.entities.abc import CollidableEntity
+from game.entities.abc import MovingEntity
 import game.common
 from library.common import Pos, ColorValue
 from game.entities.enums import Entities
@@ -20,7 +20,7 @@ def _render_triangle(height: int, color: ColorValue, dir: str) -> pygame.Surface
         surf = pygame.transform.rotate(surf, -90)
     return surf
 
-class Spike(CollidableEntity):
+class Spike(MovingEntity):
     def __init__(self, height: int, pos: Pos, dir: str) -> None:
         image = _render_triangle(height, "purple", dir)
         super().__init__(image, pos, Entities.SPIKE)
@@ -28,7 +28,35 @@ class Spike(CollidableEntity):
 
 
     def update(self, dt: float):
+        super().update()
         self.pos.y += self.vel * dt * game.common.UNIVERSAL_SPEEDUP
         self.rect.topleft = self.pos
+
+
+class Shuriken(MovingEntity):
+    SIZE = 32
+    ROTAT_SPEED = 1.2
+    SPEED = 1.2
+    once = True
+
+    def __init__(self, pos: Pos) -> None:
+        if self.once:
+            Shuriken.ORIGINAL_IMAGE = pygame.image.load("assets/obstacles/shuriken.png").convert_alpha()
+            self.once = False
+        super().__init__(Shuriken.ORIGINAL_IMAGE.copy(), pos, Entities.SHURIKEN)
+        self.angle = 0 
+        self.original_rect = self.ORIGINAL_IMAGE.get_rect()
+    
+    def update(self, dt: float):
+        super().update()
+        self.angle += self.ROTAT_SPEED * dt 
+        self.pos.y += self.SPEED * dt 
+        self.original_rect.topleft = self.pos
+        self.rect = self.image.get_rect(center=self.original_rect.center)
+        self.image = pygame.transform.rotate(self.ORIGINAL_IMAGE, self.angle)
+        self.angle %= 360
+
+
+    
 
 

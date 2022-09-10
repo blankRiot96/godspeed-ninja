@@ -9,7 +9,7 @@ import game.common
 
 class Player(CollidableEntity):
     SIZE = 50, 50
-    VEL = 3.0
+    VEL = 6.0
 
     def __init__(self) -> None:
         image = pygame.Surface(self.SIZE)
@@ -36,6 +36,6 @@ class Player(CollidableEntity):
                     self.is_space_pressed = True
 
     def update(self, dt: float):
-        self.pos.x += self.vel * dt * self.sign * game.common.UNIVERSAL_SPEEDUP
+        self.pos.x += self.vel * dt * self.sign * (game.common.UNIVERSAL_SPEEDUP / 10)
         self.rect.topleft = self.pos
 
