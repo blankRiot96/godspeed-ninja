@@ -15,17 +15,3 @@ class Platform(CollidableEntity):
         super().__init__(image, pos, type)
         self.alive = True
         self.size = self.image.get_width()
-        self.spawned_from = False
-        self.increment = 0
-
-    def update(self, event_info: EventInfo):
-        if self.increment < self.MAX_INCREMENT:
-            self.increment = game.common.SCORE / 10
-        else:
-            print(self.increment)
-    
-        self.pos.y += (event_info["dt"] * (self.SPEED + self.increment))
-        self.rect.topleft = self.pos
-
-        if self.pos.y > SCREEN_SIZE[1]:
-            self.alive = False
