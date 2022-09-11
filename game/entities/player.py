@@ -1,7 +1,7 @@
 import pygame
 from library.common import Events
 
-from game.entities.abc import CollidableEntity
+from game.entities.abc import CollidableEntity, MovingEntity
 from game.entities.enums import Entities
 from game.common import SCREEN_SIZE
 import game.common
@@ -34,6 +34,28 @@ class Player(CollidableEntity):
                 if event.key == pygame.K_SPACE:
                     self.sign *= -1
                     self.is_space_pressed = True
+
+    def predicted_pos(self, dt: float) -> pygame.Vector2:
+        pos = self.pos.copy()
+        pos.x += self.vel * dt * self.sign * (game.common.UNIVERSAL_SPEEDUP / 10)
+
+        return pos
+
+
+    # def collides(self, other: MovingEntity, dt: float) -> bool:
+    #     predicted_pos = self.predicted_pos(dt)
+    #     predicted_rect = pygame.Rect(predicted_pos, self.SIZE)
+    #     is_colliding = predicted_rect.colliderect(other.rect)
+    #     if is_colliding:
+    #         self.colliding_with = other.type
+    #     else:
+    #         self.colliding_with = None
+
+    #     return is_colliding, predicted_pos
+
+    def move(self, dv: pygame.Vector2) -> None:
+        self.pos += dv 
+        self.rect.topleft = self.pos
 
     def update(self, dt: float):
         self.pos.x += self.vel * dt * self.sign * (game.common.UNIVERSAL_SPEEDUP / 10)

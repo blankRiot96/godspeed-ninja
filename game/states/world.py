@@ -28,17 +28,23 @@ class WorldInitStage:
 
 
 class ShurikenStage(WorldInitStage):
+    SHURIKEN_INTRO_SCORE = 500
+
     def __init__(self) -> None:
         super().__init__()
         self.shuriken_gen_time = Time(3.0)
 
     def update(self, event_info: EventInfo):
         super().update(event_info)
+
+        if game.common.SCORE < self.SHURIKEN_INTRO_SCORE:
+            return 
+
         if self.shuriken_gen_time.update():
             pos_x = random.randrange(50, SCREEN_SIZE[0] - 50)
             self.shurikens.append(
                 Shuriken(
-                    pygame.Vector2(pos_x, 0)
+                    pygame.Vector2(pos_x, -50)
                 )
             )
 
@@ -53,12 +59,17 @@ class ShurikenStage(WorldInitStage):
             shuriken.draw(screen)
 
 class SpikeStage(ShurikenStage):
+    SPIKE_INTRO_SCORE = 100
+
     def __init__(self) -> None:
         super().__init__()
         self.spike_gen_time = Time(2.5)
 
     def update(self, event_info):
         super().update(event_info)
+        if game.common.SCORE < self.SPIKE_INTRO_SCORE:
+            return
+
         if self.spike_gen_time.update():
             spike_height = 30
             dir = random.choice(("left", "right"))
@@ -97,10 +108,13 @@ class PlayerStage(SpikeStage):
         for plat in self.platforms:
             if self.player.collides(plat) and not self.player.is_space_pressed:
                 self.player.vel = 0
-                if self.player.pos.x < 100:
-                    self.player.pos.x = 49
-                else:
-                    self.player.pos.x = SCREEN_SIZE[0] - 99
+
+                if self.player.pos.x - plat.pos.x > 0:
+                    self.player.rect.left = plat.rect.right 
+                elif self.player.pos.x - plat.pos.x < 0:
+                    self.player.rect.right = plat.rect.left 
+
+                break
 
         self.player.update(event_info["dt"])
 
@@ -132,19 +146,43 @@ class ScoreStage(PlayerStage):
         screen.blit(score_surf, score_rect)
 
 class PlatformStage(ScoreStage):
+    PLATFORM_INTRO_SCORE = 1000
+
     def __init__(self) -> None:
         super().__init__()
         for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
             self.platforms.append(Platform(
                 pygame.Surface((self.player.SIZE[0], SCREEN_SIZE[1])),
                 pygame.Vector2(row, 0),
-                Entities.PLATFORM
+                Entities.PLATFORM,
+                special=True
             ))
+        self.plat_gen_time = Time(5)
         
 
     def update(self, event_info):
         super().update(event_info)
         
+        if game.common.SCORE < self.PLATFORM_INTRO_SCORE:
+            return 
+        
+        if self.plat_gen_time.update():
+            width = 30
+            height = random.randrange(2, 5) * width
+            size = (width, height)
+            image = pygame.Surface(size)
+            pos_x = random.choice(tuple(x * width for x in range(2, 5)))
+            plat = Platform(image, pygame.Vector2(pos_x, -height), Entities.PLATFORM)
+
+            self.platforms.append(plat)
+
+        for plat in self.platforms[:]:
+            if not plat.is_special:
+                plat.update(event_info["dt"])
+
+            if not plat.alive:
+                self.platforms.remove(plat)
+
         
     def draw(self, screen):
         super().draw(screen)
