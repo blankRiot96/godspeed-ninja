@@ -42,17 +42,6 @@ class Player(CollidableEntity):
         return pos
 
 
-    # def collides(self, other: MovingEntity, dt: float) -> bool:
-    #     predicted_pos = self.predicted_pos(dt)
-    #     predicted_rect = pygame.Rect(predicted_pos, self.SIZE)
-    #     is_colliding = predicted_rect.colliderect(other.rect)
-    #     if is_colliding:
-    #         self.colliding_with = other.type
-    #     else:
-    #         self.colliding_with = None
-
-    #     return is_colliding, predicted_pos
-
     def move(self, dv: pygame.Vector2) -> None:
         self.pos += dv 
         self.rect.topleft = self.pos
