@@ -1,0 +1,14 @@
+{
+    "bamboo.png": {
+        "sprite_sheet": null,
+        "convert_alpha": false,
+        "states": ["world"]
+    },
+    "bamboo_2.png": {
+        "sprite_sheet": null,
+        "convert_alpha": false,
+        "states": ["world"]
+    }
+}
+
+

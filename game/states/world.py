@@ -7,6 +7,7 @@ from game.entities.enums import Entities
 from game.entities.platform import Platform
 from game.entities.obstacles import Spike, Shuriken
 from game.entities.player import Player
+from game.ui.load import LoadingScreen
 
 from library.common import EventInfo
 from library.utils.classes import Time
@@ -19,13 +20,15 @@ class WorldInitStage:
         self.spikes: list[Spike] = []
         self.shurikens: list[Shuriken] = []
         self.alive = True
+        self.loading_screen = LoadingScreen("world")
 
     def update(self, event_info: EventInfo):
-        pass 
-
-    def draw(self, screen: pygame.Surface):
         pass
 
+    def draw(self, screen: pygame.Surface):
+        while self.loading_screen.loading:
+            self.loading_screen.update()
+            self.loading_screen.draw(screen)
 
 class ShurikenStage(WorldInitStage):
     SHURIKEN_INTRO_SCORE = 500

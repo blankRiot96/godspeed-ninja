@@ -1,0 +1,7 @@
+{
+    "shuriken.png": {
+        "sprite_sheet": null,
+        "convert_alpha": true,
+        "states": ["world"]
+    }
+}
