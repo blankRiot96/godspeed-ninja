@@ -2,6 +2,7 @@ import pygame
 from library.common import EventInfo, Pos
 
 import game.common
+from game.common import SCREEN_SIZE
 from game.entities.abc import MovingEntity
 from game.entities.enums import Entities
 

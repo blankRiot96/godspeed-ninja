@@ -104,15 +104,17 @@ class PlayerStage(SpikeStage):
         self.player.handle_input(event_info["events"])
         
         # Handle Player-Platform collision 
+        self.player.vel = self.player.VEL
         for plat in self.platforms:
             if self.player.collides(plat) and not self.player.is_space_pressed:
-                horizontal_diff = self.player.pos.x - plat.pos.x
-                if horizontal_diff > 0:
-                    self.player.pos.x += horizontal_diff
-                elif horizontal_diff < 0:
-                    self.player.pos.x -= horizontal_diff
+                self.player.vel = 0
 
-                return
+                if self.player.pos.x - plat.pos.x > 0:
+                    self.player.rect.left = plat.rect.right 
+                elif self.player.pos.x - plat.pos.x < 0:
+                    self.player.rect.right = plat.rect.left 
+
+                break
 
         self.player.update(event_info["dt"])
 
