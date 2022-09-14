@@ -11,7 +11,9 @@ class Platform(MovingEntity):
     SPEED = 1.2
     MAX_INCREMENT = 1
 
-    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities, special: bool = False) -> None:
+    def __init__(
+        self, image: pygame.Surface, pos: Pos, type: Entities, special: bool = False
+    ) -> None:
         super().__init__(image, pos, type)
         self.is_special = special
         self.size = self.image.get_width()

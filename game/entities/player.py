@@ -1,10 +1,10 @@
 import pygame
 from library.common import Events
 
+import game.common
+from game.common import SCREEN_SIZE
 from game.entities.abc import CollidableEntity, MovingEntity
 from game.entities.enums import Entities
-from game.common import SCREEN_SIZE
-import game.common
 
 
 class Player(CollidableEntity):
@@ -41,7 +41,6 @@ class Player(CollidableEntity):
 
         return pos
 
-
     # def collides(self, other: MovingEntity, dt: float) -> bool:
     #     predicted_pos = self.predicted_pos(dt)
     #     predicted_rect = pygame.Rect(predicted_pos, self.SIZE)
@@ -54,10 +53,9 @@ class Player(CollidableEntity):
     #     return is_colliding, predicted_pos
 
     def move(self, dv: pygame.Vector2) -> None:
-        self.pos += dv 
+        self.pos += dv
         self.rect.topleft = self.pos
 
     def update(self, dt: float):
         self.pos.x += self.vel * dt * self.sign * (game.common.UNIVERSAL_SPEEDUP / 10)
         self.rect.topleft = self.pos
-

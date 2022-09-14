@@ -1,16 +1,16 @@
-import pygame
 import random
+
+import pygame
+from library.common import EventInfo
+from library.utils.classes import Time
 
 import game.common
 from game.common import SCREEN_SIZE
 from game.entities.enums import Entities
+from game.entities.obstacles import Shuriken, Spike
 from game.entities.platform import Platform
-from game.entities.obstacles import Spike, Shuriken
 from game.entities.player import Player
 from game.ui.load import LoadingScreen
-
-from library.common import EventInfo
-from library.utils.classes import Time
 
 
 class WorldInitStage:
@@ -30,6 +30,7 @@ class WorldInitStage:
             self.loading_screen.update()
             self.loading_screen.draw(screen)
 
+
 class ShurikenStage(WorldInitStage):
     SHURIKEN_INTRO_SCORE = 500
 
@@ -41,15 +42,11 @@ class ShurikenStage(WorldInitStage):
         super().update(event_info)
 
         if game.common.SCORE < self.SHURIKEN_INTRO_SCORE:
-            return 
+            return
 
         if self.shuriken_gen_time.update():
             pos_x = random.randrange(50, SCREEN_SIZE[0] - 50)
-            self.shurikens.append(
-                Shuriken(
-                    pygame.Vector2(pos_x, -50)
-                )
-            )
+            self.shurikens.append(Shuriken(pygame.Vector2(pos_x, -50)))
 
         for shuriken in self.shurikens[:]:
             shuriken.update(event_info["dt"])
@@ -60,6 +57,7 @@ class ShurikenStage(WorldInitStage):
         super().draw(screen)
         for shuriken in self.shurikens:
             shuriken.draw(screen)
+
 
 class SpikeStage(ShurikenStage):
     SPIKE_INTRO_SCORE = 100
@@ -86,7 +84,13 @@ class SpikeStage(ShurikenStage):
 
             for x in range(n_spikes):
                 self.spikes.append(
-                    Spike(spike_height, pygame.Vector2(pos_x, (x * spike_height) - (n_spikes * spike_height)), dir)
+                    Spike(
+                        spike_height,
+                        pygame.Vector2(
+                            pos_x, (x * spike_height) - (n_spikes * spike_height)
+                        ),
+                        dir,
+                    )
                 )
 
         for spike in self.spikes[:]:
@@ -94,7 +98,7 @@ class SpikeStage(ShurikenStage):
 
             if not spike.alive:
                 self.spikes.remove(spike)
-    
+
     def draw(self, screen):
         super().draw(screen)
         for spike in self.spikes:
@@ -105,17 +109,17 @@ class PlayerStage(SpikeStage):
     def update(self, event_info):
         super().update(event_info)
         self.player.handle_input(event_info["events"])
-        
-        # Handle Player-Platform collision 
+
+        # Handle Player-Platform collision
         self.player.vel = self.player.VEL
         for plat in self.platforms:
             if self.player.collides(plat) and not self.player.is_space_pressed:
                 self.player.vel = 0
 
                 if self.player.pos.x - plat.pos.x > 0:
-                    self.player.rect.left = plat.rect.right 
+                    self.player.rect.left = plat.rect.right
                 elif self.player.pos.x - plat.pos.x < 0:
-                    self.player.rect.right = plat.rect.left 
+                    self.player.rect.right = plat.rect.left
 
                 break
 
@@ -138,7 +142,7 @@ class ScoreStage(PlayerStage):
         super().update(event_info)
         if game.common.SCORE < 150 or game.common.SCORE % 100 == 0:
             self.score_vel += self.score_acc * event_info["dt"]
-        game.common.SCORE += self.score_vel * event_info["dt"]        
+        game.common.SCORE += self.score_vel * event_info["dt"]
         game.common.UNIVERSAL_SPEEDUP = self.score_vel * 20
 
     def draw(self, screen):
@@ -148,27 +152,29 @@ class ScoreStage(PlayerStage):
         score_rect.center = screen.get_rect().center
         screen.blit(score_surf, score_rect)
 
+
 class PlatformStage(ScoreStage):
     PLATFORM_INTRO_SCORE = 1000
 
     def __init__(self) -> None:
         super().__init__()
         for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
-            self.platforms.append(Platform(
-                pygame.Surface((self.player.SIZE[0], SCREEN_SIZE[1])),
-                pygame.Vector2(row, 0),
-                Entities.PLATFORM,
-                special=True
-            ))
+            self.platforms.append(
+                Platform(
+                    pygame.Surface((self.player.SIZE[0], SCREEN_SIZE[1])),
+                    pygame.Vector2(row, 0),
+                    Entities.PLATFORM,
+                    special=True,
+                )
+            )
         self.plat_gen_time = Time(5)
-        
 
     def update(self, event_info):
         super().update(event_info)
-        
+
         if game.common.SCORE < self.PLATFORM_INTRO_SCORE:
-            return 
-        
+            return
+
         if self.plat_gen_time.update():
             width = 30
             height = random.randrange(2, 5) * width
@@ -186,7 +192,6 @@ class PlatformStage(ScoreStage):
             if not plat.alive:
                 self.platforms.remove(plat)
 
-        
     def draw(self, screen):
         super().draw(screen)
         for plat in self.platforms:

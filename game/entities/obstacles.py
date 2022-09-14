@@ -1,9 +1,10 @@
 import pygame
+from library.common import ColorValue, Pos
 
-from game.entities.abc import MovingEntity
 import game.common
-from library.common import Pos, ColorValue
+from game.entities.abc import MovingEntity
 from game.entities.enums import Entities
+
 
 def _render_triangle(height: int, color: ColorValue, dir: str) -> pygame.Surface:
     surf = pygame.Surface((height, height), pygame.SRCALPHA)
@@ -20,12 +21,12 @@ def _render_triangle(height: int, color: ColorValue, dir: str) -> pygame.Surface
         surf = pygame.transform.rotate(surf, -90)
     return surf
 
+
 class Spike(MovingEntity):
     def __init__(self, height: int, pos: Pos, dir: str) -> None:
         image = _render_triangle(height, "purple", dir)
         super().__init__(image, pos, Entities.SPIKE)
         self.vel = 0.5
-
 
     def update(self, dt: float):
         super().update()
@@ -40,23 +41,19 @@ class Shuriken(MovingEntity):
     once = True
 
     def __init__(self, pos: Pos) -> None:
+        print(game.common.assets)
         if self.once:
-            Shuriken.ORIGINAL_IMAGE = pygame.image.load("assets/obstacles/shuriken.png").convert_alpha()
+            Shuriken.ORIGINAL_IMAGE = game.common.assets["shuriken"].copy()
             self.once = False
         super().__init__(Shuriken.ORIGINAL_IMAGE.copy(), pos, Entities.SHURIKEN)
-        self.angle = 0 
+        self.angle = 0
         self.original_rect = self.ORIGINAL_IMAGE.get_rect()
-    
+
     def update(self, dt: float):
         super().update()
-        self.angle += self.ROTAT_SPEED * dt 
-        self.pos.y += self.SPEED * dt 
+        self.angle += self.ROTAT_SPEED * dt
+        self.pos.y += self.SPEED * dt
         self.original_rect.topleft = self.pos
         self.rect = self.image.get_rect(center=self.original_rect.center)
         self.image = pygame.transform.rotate(self.ORIGINAL_IMAGE, self.angle)
         self.angle %= 360
-
-
-    
-
-

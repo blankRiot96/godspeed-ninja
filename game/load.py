@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Tuple, Iterator
+from typing import Iterator, Tuple
 
 import pygame
 
@@ -62,10 +62,9 @@ def load_images(state: str) -> Iterator:
             if data["sprite_sheet"] is None:
                 asset = image
             else:
-                asset = get_images_from_spritesheet(image, *data["sprite_sheet"].values())
+                asset = get_images_from_spritesheet(
+                    image, *data["sprite_sheet"].values()
+                )
 
             file_extension = file[file.find(".") :]
-
             yield {file.replace(file_extension, ""): asset}
-
-

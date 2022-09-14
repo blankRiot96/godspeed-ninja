@@ -3,8 +3,8 @@ import abc
 import pygame
 from library.common import Pos
 from typing_extensions import Self
-from game.common import SCREEN_SIZE
 
+from game.common import SCREEN_SIZE
 from game.entities.enums import Entities
 
 
@@ -44,4 +44,4 @@ class MovingEntity(CollidableEntity):
 
     def update(self):
         if self.pos.y > SCREEN_SIZE[1]:
-            self.alive = False 
+            self.alive = False
