@@ -24,7 +24,9 @@ class LoadingScreen:
                 SCREEN_SIZE,
             )
         }
-        self.t = Time(3)
+        self.asset_gen = load_images(state)
+        self.t = Time(10)
+        
 
     def loading_text_mod(self):
         if self.loading_t.update():
@@ -32,15 +34,21 @@ class LoadingScreen:
             if self.loading_text == "Loading....":
                 self.loading_text = "Loading"
 
-    def update(self) -> None:
-        pygame.event.get()
+    def handle_quit(self) -> None:
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                raise SystemExit
+
+    def update(self) -> None: 
+        self.handle_quit()
         self.loading_text_mod()
 
-        asset = next(load_images(self.state))
-
-        # Checking if the asset is the same, i.e, done loading
-        if list(asset)[0] in game.common.assets and self.t.update():
-            self.loading = False
+        try:
+            asset = next(self.asset_gen)
+        except StopIteration:
+            if self.t.update():
+                self.loading = False
             return
 
         game.common.assets |= asset

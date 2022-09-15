@@ -32,7 +32,7 @@ class WorldInitStage:
 
 
 class ShurikenStage(WorldInitStage):
-    SHURIKEN_INTRO_SCORE = 500
+    SHURIKEN_INTRO_SCORE = 10
 
     def __init__(self) -> None:
         super().__init__()
