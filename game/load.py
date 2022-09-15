@@ -56,6 +56,7 @@ def load_images(state: str) -> Iterator:
     yield len(json_files)
     for metadata_f in json_files:
         metadata = json.loads(metadata_f.read_text())
+        assets = {}
         for file, data in metadata.items():
             if state not in data["states"] and data["states"] != ["*"]:
                 continue
@@ -75,7 +76,8 @@ def load_images(state: str) -> Iterator:
                 )
 
             file_extension = file[file.find(".") :]
-            yield {file.replace(file_extension, ""): asset}
+            assets[file.replace(file_extension, "")] = asset
+        yield assets
     
 
     
