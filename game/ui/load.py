@@ -27,14 +27,11 @@ class LoadingScreen:
         }
         self.asset_gen = load_images(state)
         self.total_metafiles = next(self.asset_gen)
-        self.loading_bar = LoadingBar("black", "white", pygame.Rect(
-            ((SCREEN_SIZE[0] // 2) - 110, 600),
-            (220, 30)
-            )
+        self.loading_bar = LoadingBar(
+            "black", "white", pygame.Rect(((SCREEN_SIZE[0] // 2) - 110, 600), (220, 30))
         )
         self.t = Time(3)
         self.n_metafiles_loaded = 0
-        
 
     def loading_text_mod(self):
         if self.loading_t.update():
@@ -48,12 +45,12 @@ class LoadingScreen:
             if event.type == pygame.QUIT:
                 raise SystemExit
 
-    def update(self) -> None: 
+    def update(self) -> None:
         self.handle_quit()
         self.loading_text_mod()
 
         if not self.t.update():
-            return 
+            return
 
         try:
             asset = next(self.asset_gen)
@@ -72,4 +69,3 @@ class LoadingScreen:
 
         self.loading_bar.draw(screen)
         pygame.display.flip()
-

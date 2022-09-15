@@ -1,12 +1,13 @@
 import pygame
-
 from library.common import ColorValue
 
 
 class LoadingBar:
     """A simple loading bar."""
 
-    def __init__(self, back_color: ColorValue, fore_color: ColorValue, rect: pygame.Rect) -> None:
+    def __init__(
+        self, back_color: ColorValue, fore_color: ColorValue, rect: pygame.Rect
+    ) -> None:
         self.back_color = back_color
         self.fore_color = fore_color
         self.back_rect = rect
@@ -17,8 +18,8 @@ class LoadingBar:
         """Updates the loading bar.
 
         Args:
-            ratio (float): The ratio of 
-        
+            ratio (float): The ratio of
+
         Returns:
             None
         """
@@ -30,11 +31,9 @@ class LoadingBar:
 
         Args:
             screen (pygame.Surface): Surface to draw on.
-        
+
         Returns:
             None
         """
         pygame.draw.rect(screen, self.back_color, self.back_rect)
         pygame.draw.rect(screen, self.fore_color, self.rect)
-         
-

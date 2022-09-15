@@ -1,8 +1,8 @@
 import json
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Tuple
-from dataclasses import dataclass
 
 import pygame
 
@@ -13,6 +13,7 @@ logger = logging.getLogger()
 class LoadingInfo:
     asset: dict[str, pygame.Surface | list]
     total_files = int
+
 
 def get_images_from_spritesheet(
     sheet: pygame.Surface,
@@ -78,6 +79,3 @@ def load_images(state: str) -> Iterator:
             file_extension = file[file.find(".") :]
             assets[file.replace(file_extension, "")] = asset
         yield assets
-    
-
-    
