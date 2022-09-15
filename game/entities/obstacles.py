@@ -41,7 +41,6 @@ class Shuriken(MovingEntity):
     once = True
 
     def __init__(self, pos: Pos) -> None:
-        print(game.common.assets)
         if self.once:
             Shuriken.ORIGINAL_IMAGE = game.common.assets["shuriken"].copy()
             self.once = False

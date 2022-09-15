@@ -52,6 +52,8 @@ def load_images(state: str) -> Iterator:
     path = Path("assets/images/")
 
     json_files = path.rglob("*.json")
+    json_files = tuple(json_files)
+    yield len(json_files)
     for metadata_f in json_files:
         metadata = json.loads(metadata_f.read_text())
         for file, data in metadata.items():

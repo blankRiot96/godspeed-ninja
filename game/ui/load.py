@@ -4,6 +4,7 @@ from library.utils.classes import Time
 import game.common
 from game.common import SCREEN_SIZE
 from game.load import load_images
+from game.ui.loading_bar import LoadingBar
 
 
 class LoadingScreen:
@@ -25,7 +26,14 @@ class LoadingScreen:
             )
         }
         self.asset_gen = load_images(state)
-        self.t = Time(10)
+        self.total_metafiles = next(self.asset_gen)
+        self.loading_bar = LoadingBar("black", "white", pygame.Rect(
+            ((SCREEN_SIZE[0] // 2) - 110, 600),
+            (220, 30)
+            )
+        )
+        self.t = Time(3)
+        self.n_metafiles_loaded = 0
         
 
     def loading_text_mod(self):
@@ -44,11 +52,15 @@ class LoadingScreen:
         self.handle_quit()
         self.loading_text_mod()
 
+        if not self.t.update():
+            return 
+
         try:
             asset = next(self.asset_gen)
+            self.n_metafiles_loaded += 1
+            self.loading_bar.update(self.n_metafiles_loaded / self.total_metafiles)
         except StopIteration:
-            if self.t.update():
-                self.loading = False
+            self.loading = False
             return
 
         game.common.assets |= asset
@@ -56,5 +68,8 @@ class LoadingScreen:
     def draw(self, screen: pygame.Surface) -> None:
         screen.blit(game.common.assets["loading_screen"], (0, 0))
         loading_text_surf = self.FONT.render(self.loading_text, True, "black")
-        screen.blit(loading_text_surf, (120, 550))
+        screen.blit(loading_text_surf, (120, 540))
+
+        self.loading_bar.draw(screen)
         pygame.display.flip()
+
