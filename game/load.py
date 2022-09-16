@@ -9,12 +9,6 @@ import pygame
 logger = logging.getLogger()
 
 
-@dataclass
-class LoadingInfo:
-    asset: dict[str, pygame.Surface | list]
-    total_files = int
-
-
 def get_images_from_spritesheet(
     sheet: pygame.Surface,
     size: Tuple[int],
