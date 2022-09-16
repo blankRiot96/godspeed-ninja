@@ -1,5 +1,5 @@
 import pygame
-from library.common import ColorValue, Pos
+from pglib.common import ColorValue, Pos
 
 import game.common
 from game.entities.abc import MovingEntity

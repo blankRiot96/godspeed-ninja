@@ -1,5 +1,5 @@
 import pygame
-from library.common import Events
+from pglib.common import Events
 
 import game.common
 from game.common import SCREEN_SIZE

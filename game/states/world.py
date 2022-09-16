@@ -1,8 +1,8 @@
 import random
 
 import pygame
-from library.common import EventInfo
-from library.utils.classes import Time
+from pglib.common import EventInfo
+from pglib.utils.classes import Time
 
 import game.common
 from game.common import SCREEN_SIZE

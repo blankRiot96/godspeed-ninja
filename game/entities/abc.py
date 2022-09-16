@@ -1,7 +1,7 @@
 import abc
 
 import pygame
-from library.common import Pos
+from pglib.common import Pos
 from typing_extensions import Self
 
 from game.common import SCREEN_SIZE

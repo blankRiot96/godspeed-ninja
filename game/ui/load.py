@@ -1,5 +1,5 @@
 import pygame
-from library.utils.classes import Time
+from pglib.utils.classes import Time
 
 import game.common
 from game.common import SCREEN_SIZE
