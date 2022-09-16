@@ -5,12 +5,13 @@ from pglib.common import EventInfo
 from pglib.utils.classes import Time
 
 import game.common
-from game.common import SCREEN_SIZE
+from game.common import SCREEN_SIZE, IMAGE_PATH, FONT_PATH
 from game.entities.enums import Entities
 from game.entities.obstacles import Shuriken, Spike
 from game.entities.platform import Platform
 from game.entities.player import Player
-from game.ui.load import LoadingScreen
+from pglib.ui.loading_screen import LoadingScreen
+from pglib.ui.loading_bar import LoadingBar
 
 
 class WorldInitStage:
@@ -20,19 +21,46 @@ class WorldInitStage:
         self.spikes: list[Spike] = []
         self.shurikens: list[Shuriken] = []
         self.alive = True
-        self.loading_screen = LoadingScreen("world")
+
 
     def update(self, event_info: EventInfo):
         pass
 
     def draw(self, screen: pygame.Surface):
+        pass
+
+class LoadingScreenStage(WorldInitStage):
+    def __init__(self) -> None:
+        super().__init__()
+        loading_screen = pygame.image.load(IMAGE_PATH / "backgrounds" / "loading_screen.png").convert()
+        loading_screen = pygame.transform.scale(loading_screen, SCREEN_SIZE)
+        game.common.assets |= {"loading_screen": loading_screen}
+        self.loading_screen = LoadingScreen(
+            "world",
+            game.common.assets,
+            LoadingBar(
+                "grey",
+                "white",
+                pygame.Rect(
+                    (0, SCREEN_SIZE[1] - 20),
+                    (SCREEN_SIZE[0], 20)
+                )
+            ),
+            font=pygame.font.Font(FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20),
+            font_color="white",
+            debug_timer=3
+        )
+
+    def draw(self, screen: pygame.Surface):
+        super().draw(screen)
         while self.loading_screen.loading:
             self.loading_screen.update()
             self.loading_screen.draw(screen)
 
 
-class ShurikenStage(WorldInitStage):
-    SHURIKEN_INTRO_SCORE = 10
+
+class ShurikenStage(LoadingScreenStage):
+    SHURIKEN_INTRO_SCORE = 500
 
     def __init__(self) -> None:
         super().__init__()
