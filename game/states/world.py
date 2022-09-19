@@ -142,11 +142,10 @@ class PlayerStage(SpikeStage):
         for plat in self.platforms:
             if self.player.collides(plat) and not self.player.is_space_pressed:
                 self.player.vel = 0
-
-                if self.player.pos.x - plat.pos.x > 0:
-                    self.player.rect.left = plat.rect.right
-                elif self.player.pos.x - plat.pos.x < 0:
-                    self.player.rect.right = plat.rect.left
+                # if self.player.pos.x - plat.pos.x > 0:
+                #     self.player.rect.left = plat.rect.left
+                # elif self.player.pos.x - plat.pos.x < 0:
+                #     self.player.rect.right = plat.rect.right
 
                 break
 

@@ -28,7 +28,8 @@ class Player(CollidableEntity):
         Changes side when space bar is pressed.
         """
 
-        self.is_space_pressed = False
+        if self.colliding_with is None:
+            self.is_space_pressed = False
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -59,3 +60,4 @@ class Player(CollidableEntity):
     def update(self, dt: float):
         self.pos.x += self.vel * dt * self.sign * (game.common.UNIVERSAL_SPEEDUP / 10)
         self.rect.topleft = self.pos
+
