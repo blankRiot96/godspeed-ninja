@@ -4,6 +4,11 @@ version = "0.1.0"
 description = ""
 authors = ["Axis <77634274+blankRiot96@users.noreply.github.com>"]
 
+dependencies = [
+    "pygame>2.1.2",
+    "git+https://github.com/blankRiot96/pglib",
+]
+
 [tool.poetry.dependencies]
 python = "^3.10"
 

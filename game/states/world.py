@@ -48,7 +48,6 @@ class LoadingScreenStage(WorldInitStage):
             ),
             font=pygame.font.Font(FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20),
             font_color="white",
-            debug_timer=3
         )
 
     def draw(self, screen: pygame.Surface):
