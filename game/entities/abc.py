@@ -1,7 +1,8 @@
 import abc
+from typing import Optional
 
 import pygame
-from pglib.common import Pos
+from pglib.common import Pos, Size
 from typing_extensions import Self
 
 from game.common import SCREEN_SIZE
@@ -19,9 +20,13 @@ class Entity(abc.ABC):
 
 
 class CollidableEntity(Entity):
-    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities) -> None:
+    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities, size: Optional[Size] = None) -> None:
         super().__init__(image, pos, type)
-        self.rect = pygame.Rect(pos, self.image.get_size())
+        if size:
+            self.size = size 
+        else:
+            self.size = self.image.get_size()
+        self.rect = pygame.Rect(pos, self.size)
         self.colliding_with = None
 
     def collides(self, other: Self) -> bool:
@@ -38,8 +43,8 @@ class CollidableEntity(Entity):
 
 
 class MovingEntity(CollidableEntity):
-    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities) -> None:
-        super().__init__(image, pos, type)
+    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities, size: Optional[Size] = None) -> None:
+        super().__init__(image, pos, type, size)
         self.alive = True
 
     def update(self):

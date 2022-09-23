@@ -48,14 +48,12 @@ class LoadingScreenStage(WorldInitStage):
             ),
             font=pygame.font.Font(FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20),
             font_color="white",
+            debug_timer=0.1
         )
 
-    def draw(self, screen: pygame.Surface):
-        super().draw(screen)
         while self.loading_screen.loading:
             self.loading_screen.update()
-            self.loading_screen.draw(screen)
-
+            self.loading_screen.draw(pygame.display.get_surface())
 
 
 class ShurikenStage(LoadingScreenStage):
@@ -184,20 +182,41 @@ class PlatformStage(ScoreStage):
 
     def __init__(self) -> None:
         super().__init__()
-        for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
-            self.platforms.append(
-                Platform(
-                    pygame.Surface((self.player.SIZE[0], SCREEN_SIZE[1])),
-                    pygame.Vector2(row, 0),
-                    Entities.PLATFORM,
-                    special=True,
+        platform_image_name = "bamboo_{n}"
+        print(game.common.assets)
+        n = 1
+        for i in range(2):
+            for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
+                image = game.common.assets[platform_image_name.format(n=n)]
+                size = (30, SCREEN_SIZE[1])
+                image = pygame.transform.scale(image, (size[0] + 100, size[1]))
+                if row != 0:
+                    image = pygame.transform.flip(image, True, False)
+
+                self.platforms.append(
+                    Platform(
+                        image,
+                        pygame.Vector2(row, 0 - (i * SCREEN_SIZE[1])),
+                        Entities.PLATFORM,
+                        size=size,
+                        special=True,
+                    )
                 )
-            )
+                n *= -1
         self.plat_gen_time = Time(5)
 
     def update(self, event_info):
         super().update(event_info)
 
+        for plat in self.platforms[:]:
+            plat.update(event_info["dt"])
+            
+            if not plat.alive:
+                self.platforms.remove(plat)
+
+        # Everything after this if statement 
+        # is only for when the player reaches a 
+        # certain score.
         if game.common.SCORE < self.PLATFORM_INTRO_SCORE:
             return
 
@@ -211,12 +230,6 @@ class PlatformStage(ScoreStage):
 
             self.platforms.append(plat)
 
-        for plat in self.platforms[:]:
-            if not plat.is_special:
-                plat.update(event_info["dt"])
-
-            if not plat.alive:
-                self.platforms.remove(plat)
 
     def draw(self, screen):
         super().draw(screen)
