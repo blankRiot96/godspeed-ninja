@@ -130,31 +130,7 @@ class SpikeStage(ShurikenStage):
             spike.draw(screen)
 
 
-class PlayerStage(SpikeStage):
-    def update(self, event_info):
-        super().update(event_info)
-        self.player.handle_input(event_info["events"])
-
-        # Handle Player-Platform collision
-        self.player.vel = self.player.VEL
-        for plat in self.platforms:
-            if self.player.collides(plat) and not self.player.is_space_pressed:
-                self.player.vel = 0
-                # if self.player.pos.x - plat.pos.x > 0:
-                #     self.player.rect.left = plat.rect.left
-                # elif self.player.pos.x - plat.pos.x < 0:
-                #     self.player.rect.right = plat.rect.right
-
-                break
-
-        self.player.update(event_info["dt"])
-
-    def draw(self, screen):
-        super().draw(screen)
-        self.player.draw(screen)
-
-
-class ScoreStage(PlayerStage):
+class ScoreStage(SpikeStage):
     SCORE_FONT = pygame.font.SysFont("comicsans", 40)
 
     def __init__(self) -> None:
@@ -187,16 +163,17 @@ class PlatformStage(ScoreStage):
         n = 1
         for i in range(2):
             for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
-                image = game.common.assets[platform_image_name.format(n=n)]
-                size = (30, SCREEN_SIZE[1])
-                image = pygame.transform.scale(image, (size[0] + 100, size[1]))
+                image: pygame.Surface = game.common.assets[platform_image_name.format(n=n)]
+                image = image.subsurface(image.get_bounding_rect())
+                size = (29, SCREEN_SIZE[1])
+                image = pygame.transform.scale(image, (size[0] + 64, size[1]))
                 if row != 0:
                     image = pygame.transform.flip(image, True, False)
 
                 self.platforms.append(
                     Platform(
                         image,
-                        pygame.Vector2(row, 0 - (i * SCREEN_SIZE[1])),
+                        pygame.Vector2(row if row == 0 else row + 20, 0 - (i * SCREEN_SIZE[1])),
                         Entities.PLATFORM,
                         size=size,
                         special=True,
@@ -237,5 +214,29 @@ class PlatformStage(ScoreStage):
             plat.draw(screen)
 
 
-class World(PlatformStage):
+
+class PlayerStage(PlatformStage):
+    def update(self, event_info):
+        super().update(event_info)
+        self.player.handle_input(event_info["events"])
+
+        # Handle Player-Platform collision
+        self.player.vel = self.player.VEL
+        for plat in self.platforms:
+            if self.player.collides(plat) and not self.player.is_space_pressed:
+                self.player.vel = 0
+                # if self.player.pos.x - plat.pos.x > 0:
+                #     self.player.rect.left = plat.rect.left
+                # elif self.player.pos.x - plat.pos.x < 0:
+                #     self.player.rect.right = plat.rect.right
+
+                break
+
+        self.player.update(event_info["dt"])
+
+    def draw(self, screen):
+        super().draw(screen)
+        self.player.draw(screen)
+
+class World(PlayerStage):
     pass

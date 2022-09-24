@@ -33,7 +33,11 @@ class Platform(MovingEntity):
         self.rect.topleft = self.pos
     
     def draw(self, screen):
-        if self.rect.x < 100:
-            screen.blit(self.image, (self.rect.x - 40, self.rect.y))
+        if self.is_special:
+            if self.rect.x < SCREEN_SIZE[0] / 2:
+                screen.blit(self.image, (self.rect.x, self.rect.y))
+            else:
+                screen.blit(self.image, (self.rect.x - 94 + 29, self.rect.y))
         else:
-            screen.blit(self.image, (self.rect.x - 40, self.rect.y))
+            screen.blit(self.image, self.rect)
+        pygame.draw.rect(screen, "red", self.rect, 2)
