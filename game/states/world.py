@@ -50,7 +50,7 @@ class LoadingScreenStage(WorldInitStage):
                 FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20
             ),
             font_color="white",
-            debug_timer=1.5,
+            debug_timer=0.1,
         )
 
         while self.loading_screen.loading:
@@ -69,7 +69,7 @@ class BackgroundRenderStage(LoadingScreenStage):
         super().update(event_info)
         bg_copy = self.uncolored_bg.copy()
         tint = ((self.player.distance_covered / 50) % 100) / 100
-        color = colorsys.hsv_to_rgb(tint, 1, 1)
+        color = colorsys.hsv_to_rgb(tint, 1, 0.5)
         bg_copy.fill(
             (color[0] * 255, color[1] * 255, color[2] * 255),
             special_flags=pygame.BLEND_ADD,
