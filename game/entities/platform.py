@@ -1,4 +1,5 @@
 from typing import Optional
+
 import pygame
 from pglib.common import EventInfo, Pos, Size
 
@@ -13,7 +14,12 @@ class Platform(MovingEntity):
     MAX_INCREMENT = 1
 
     def __init__(
-        self, image: pygame.Surface, pos: Pos, type: Entities, size: Optional[Size] = None, special: bool = False
+        self,
+        image: pygame.Surface,
+        pos: Pos,
+        type: Entities,
+        size: Optional[Size] = None,
+        special: bool = False,
     ) -> None:
         super().__init__(image, pos, type, size)
         self.is_special = special
@@ -26,12 +32,12 @@ class Platform(MovingEntity):
             if self.pos.y >= SCREEN_SIZE[1]:
                 self.pos.y = -SCREEN_SIZE[1] + dy
             self.rect.topleft = self.pos
-            return 
+            return
 
         super().update()
         self.pos.y += dy * 0.9
         self.rect.topleft = self.pos
-    
+
     def draw(self, screen):
         if self.is_special:
             if self.rect.x < SCREEN_SIZE[0] / 2:

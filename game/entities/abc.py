@@ -20,10 +20,16 @@ class Entity(abc.ABC):
 
 
 class CollidableEntity(Entity):
-    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities, size: Optional[Size] = None) -> None:
+    def __init__(
+        self,
+        image: pygame.Surface,
+        pos: Pos,
+        type: Entities,
+        size: Optional[Size] = None,
+    ) -> None:
         super().__init__(image, pos, type)
         if size:
-            self.size = size 
+            self.size = size
         else:
             self.size = self.image.get_size()
         self.rect = pygame.Rect(pos, self.size)
@@ -43,7 +49,13 @@ class CollidableEntity(Entity):
 
 
 class MovingEntity(CollidableEntity):
-    def __init__(self, image: pygame.Surface, pos: Pos, type: Entities, size: Optional[Size] = None) -> None:
+    def __init__(
+        self,
+        image: pygame.Surface,
+        pos: Pos,
+        type: Entities,
+        size: Optional[Size] = None,
+    ) -> None:
         super().__init__(image, pos, type, size)
         self.alive = True
 

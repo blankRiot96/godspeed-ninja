@@ -1,18 +1,18 @@
-import random
 import colorsys
+import random
 
 import pygame
 from pglib.common import EventInfo
+from pglib.ui.loading_bar import LoadingBar
+from pglib.ui.loading_screen import LoadingScreen
 from pglib.utils.classes import Time
 
 import game.common
-from game.common import SCREEN_SIZE, IMAGE_PATH, FONT_PATH
+from game.common import FONT_PATH, IMAGE_PATH, SCREEN_SIZE
 from game.entities.enums import Entities
 from game.entities.obstacles import Shuriken, Spike
 from game.entities.platform import Platform
 from game.entities.player import Player
-from pglib.ui.loading_screen import LoadingScreen
-from pglib.ui.loading_bar import LoadingBar
 
 
 class WorldInitStage:
@@ -23,17 +23,19 @@ class WorldInitStage:
         self.shurikens: list[Shuriken] = []
         self.alive = True
 
-
     def update(self, event_info: EventInfo):
         pass
 
     def draw(self, screen: pygame.Surface):
         pass
 
+
 class LoadingScreenStage(WorldInitStage):
     def __init__(self) -> None:
         super().__init__()
-        loading_screen = pygame.image.load(IMAGE_PATH / "backgrounds" / "loading_screen.png").convert()
+        loading_screen = pygame.image.load(
+            IMAGE_PATH / "backgrounds" / "loading_screen.png"
+        ).convert()
         loading_screen = pygame.transform.scale(loading_screen, SCREEN_SIZE)
         game.common.assets |= {"loading_screen": loading_screen}
         self.loading_screen = LoadingScreen(
@@ -42,19 +44,19 @@ class LoadingScreenStage(WorldInitStage):
             LoadingBar(
                 "grey",
                 "white",
-                pygame.Rect(
-                    (0, SCREEN_SIZE[1] - 20),
-                    (SCREEN_SIZE[0], 20)
-                )
+                pygame.Rect((0, SCREEN_SIZE[1] - 20), (SCREEN_SIZE[0], 20)),
             ),
-            font=pygame.font.Font(FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20),
+            font=pygame.font.Font(
+                FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20
+            ),
             font_color="white",
-            debug_timer=1.5
+            debug_timer=1.5,
         )
 
         while self.loading_screen.loading:
             self.loading_screen.update()
             self.loading_screen.draw(pygame.display.get_surface())
+
 
 class BackgroundRenderStage(LoadingScreenStage):
     def __init__(self) -> None:
@@ -68,13 +70,16 @@ class BackgroundRenderStage(LoadingScreenStage):
         bg_copy = self.uncolored_bg.copy()
         tint = ((self.player.distance_covered / 50) % 100) / 100
         color = colorsys.hsv_to_rgb(tint, 1, 1)
-        bg_copy.fill((color[0]*255, color[1]*255, color[2]*255), special_flags=pygame.BLEND_ADD)
+        bg_copy.fill(
+            (color[0] * 255, color[1] * 255, color[2] * 255),
+            special_flags=pygame.BLEND_ADD,
+        )
         game.common.assets["bg"] = bg_copy.copy()
-
 
     def draw(self, screen: pygame.Surface):
         super().draw(screen)
         screen.blit(game.common.assets["bg"], (0, 0))
+
 
 class PlatformStage(BackgroundRenderStage):
     PLATFORM_INTRO_SCORE = 1000
@@ -86,7 +91,9 @@ class PlatformStage(BackgroundRenderStage):
         n = 1
         for i in range(2):
             for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
-                image: pygame.Surface = game.common.assets[platform_image_name.format(n=n)]
+                image: pygame.Surface = game.common.assets[
+                    platform_image_name.format(n=n)
+                ]
                 image = image.subsurface(image.get_bounding_rect())
                 size = (29, SCREEN_SIZE[1])
                 image = pygame.transform.scale(image, (size[0] + 64, size[1]))
@@ -96,7 +103,9 @@ class PlatformStage(BackgroundRenderStage):
                 self.platforms.append(
                     Platform(
                         image,
-                        pygame.Vector2(row if row == 0 else row + 20, 0 - (i * SCREEN_SIZE[1])),
+                        pygame.Vector2(
+                            row if row == 0 else row + 20, 0 - (i * SCREEN_SIZE[1])
+                        ),
                         Entities.PLATFORM,
                         size=size,
                         special=True,
@@ -110,12 +119,12 @@ class PlatformStage(BackgroundRenderStage):
 
         for plat in self.platforms[:]:
             plat.update(event_info["dt"])
-            
+
             if not plat.alive:
                 self.platforms.remove(plat)
 
-        # Everything after this if statement 
-        # is only for when the player reaches a 
+        # Everything after this if statement
+        # is only for when the player reaches a
         # certain score.
         if game.common.SCORE < self.PLATFORM_INTRO_SCORE:
             return
@@ -129,7 +138,6 @@ class PlatformStage(BackgroundRenderStage):
             plat = Platform(image, pygame.Vector2(pos_x, -height), Entities.PLATFORM)
 
             self.platforms.append(plat)
-
 
     def draw(self, screen):
         super().draw(screen)
@@ -242,12 +250,17 @@ class PlayerStage(ScoreStage):
         # Handle Player-Platform collision
         self.player.vel = self.player.VEL
         for plat in self.platforms:
-            if self.player.would_collide(plat, event_info["dt"]) and not self.player.is_space_pressed:
+            if (
+                self.player.would_collide(plat, event_info["dt"])
+                and not self.player.is_space_pressed
+            ):
                 self.player.vel = 0
                 if self.player.rect.x > plat.rect.x:
                     self.player.pos.x = plat.rect.left + plat.size[0]
                 else:
-                    self.player.pos.x = plat.rect.right - self.player.SIZE[0] - plat.size[0]
+                    self.player.pos.x = (
+                        plat.rect.right - self.player.SIZE[0] - plat.size[0]
+                    )
 
                 break
 
@@ -256,6 +269,7 @@ class PlayerStage(ScoreStage):
     def draw(self, screen):
         super().draw(screen)
         self.player.draw(screen)
+
 
 class World(PlayerStage):
     pass
