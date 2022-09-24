@@ -1,4 +1,7 @@
 import pygame
+
+from typing_extensions import Self
+
 from pglib.common import Events
 
 import game.common
@@ -42,6 +45,22 @@ class Player(CollidableEntity):
 
         return pos
 
+
+    def predicted_move(self, dt: float) -> pygame.Vector2:
+        dx = self.vel * dt * self.sign * (game.common.UNIVERSAL_SPEEDUP / 10)
+
+        return pygame.Vector2(dx, 0) 
+
+    def would_collide(self, other: MovingEntity, dt: float) -> bool:
+        rect = self.move_rect(self.predicted_move(dt))
+        is_colliding = rect.colliderect(other.rect)
+        if is_colliding:
+            self.colliding_with = other.type
+        else:
+            self.colliding_with = None
+
+        return is_colliding
+
     # def collides(self, other: MovingEntity, dt: float) -> bool:
     #     predicted_pos = self.predicted_pos(dt)
     #     predicted_rect = pygame.Rect(predicted_pos, self.SIZE)
@@ -53,7 +72,16 @@ class Player(CollidableEntity):
 
     #     return is_colliding, predicted_pos
 
-    def move(self, dv: pygame.Vector2) -> None:
+    def move_rect(self, dv: pygame.Vector2) -> None:
+        stub = self.rect.copy()
+        pos = self.pos.copy()
+        pos += dv 
+        stub.topleft = pos 
+
+        return stub
+
+
+    def move_ip(self, dv: pygame.Vector2) -> None:
         self.pos += dv
         self.rect.topleft = self.pos
 

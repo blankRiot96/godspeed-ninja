@@ -48,112 +48,14 @@ class LoadingScreenStage(WorldInitStage):
             ),
             font=pygame.font.Font(FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20),
             font_color="white",
-            debug_timer=0.1
+            debug_timer=3.0
         )
 
         while self.loading_screen.loading:
             self.loading_screen.update()
             self.loading_screen.draw(pygame.display.get_surface())
 
-
-class ShurikenStage(LoadingScreenStage):
-    SHURIKEN_INTRO_SCORE = 500
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.shuriken_gen_time = Time(3.0)
-
-    def update(self, event_info: EventInfo):
-        super().update(event_info)
-
-        if game.common.SCORE < self.SHURIKEN_INTRO_SCORE:
-            return
-
-        if self.shuriken_gen_time.update():
-            pos_x = random.randrange(50, SCREEN_SIZE[0] - 50)
-            self.shurikens.append(Shuriken(pygame.Vector2(pos_x, -50)))
-
-        for shuriken in self.shurikens[:]:
-            shuriken.update(event_info["dt"])
-            if not shuriken.alive:
-                self.shurikens.remove(shuriken)
-
-    def draw(self, screen):
-        super().draw(screen)
-        for shuriken in self.shurikens:
-            shuriken.draw(screen)
-
-
-class SpikeStage(ShurikenStage):
-    SPIKE_INTRO_SCORE = 100
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.spike_gen_time = Time(2.5)
-
-    def update(self, event_info):
-        super().update(event_info)
-        if game.common.SCORE < self.SPIKE_INTRO_SCORE:
-            return
-
-        if self.spike_gen_time.update():
-            spike_height = 30
-            dir = random.choice(("left", "right"))
-
-            if dir == "left":
-                pos_x = 50
-            else:
-                pos_x = SCREEN_SIZE[0] - 80
-
-            n_spikes = random.randrange(2, 5)
-
-            for x in range(n_spikes):
-                self.spikes.append(
-                    Spike(
-                        spike_height,
-                        pygame.Vector2(
-                            pos_x, (x * spike_height) - (n_spikes * spike_height)
-                        ),
-                        dir,
-                    )
-                )
-
-        for spike in self.spikes[:]:
-            spike.update(event_info["dt"])
-
-            if not spike.alive:
-                self.spikes.remove(spike)
-
-    def draw(self, screen):
-        super().draw(screen)
-        for spike in self.spikes:
-            spike.draw(screen)
-
-
-class ScoreStage(SpikeStage):
-    SCORE_FONT = pygame.font.SysFont("comicsans", 40)
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.score_vel = 0.1
-        self.score_acc = 0.001
-
-    def update(self, event_info):
-        super().update(event_info)
-        if game.common.SCORE < 150 or game.common.SCORE % 100 == 0:
-            self.score_vel += self.score_acc * event_info["dt"]
-        game.common.SCORE += self.score_vel * event_info["dt"]
-        game.common.UNIVERSAL_SPEEDUP = self.score_vel * 20
-
-    def draw(self, screen):
-        super().draw(screen)
-        score_surf = self.SCORE_FONT.render(f"{game.common.SCORE:.0f}", True, "black")
-        score_rect = score_surf.get_rect()
-        score_rect.center = screen.get_rect().center
-        screen.blit(score_surf, score_rect)
-
-
-class PlatformStage(ScoreStage):
+class PlatformStage(LoadingScreenStage):
     PLATFORM_INTRO_SCORE = 1000
 
     def __init__(self) -> None:
@@ -214,8 +116,104 @@ class PlatformStage(ScoreStage):
             plat.draw(screen)
 
 
+class ShurikenStage(PlatformStage):
+    SHURIKEN_INTRO_SCORE = 500
 
-class PlayerStage(PlatformStage):
+    def __init__(self) -> None:
+        super().__init__()
+        self.shuriken_gen_time = Time(3.0)
+
+    def update(self, event_info: EventInfo):
+        super().update(event_info)
+
+        if game.common.SCORE < self.SHURIKEN_INTRO_SCORE:
+            return
+
+        if self.shuriken_gen_time.update():
+            pos_x = random.randrange(50, SCREEN_SIZE[0] - 50)
+            self.shurikens.append(Shuriken(pygame.Vector2(pos_x, -50)))
+
+        for shuriken in self.shurikens[:]:
+            shuriken.update(event_info["dt"])
+            if not shuriken.alive:
+                self.shurikens.remove(shuriken)
+
+    def draw(self, screen):
+        super().draw(screen)
+        for shuriken in self.shurikens:
+            shuriken.draw(screen)
+
+
+class SpikeStage(ShurikenStage):
+    SPIKE_INTRO_SCORE = 100
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.spike_gen_time = Time(2.5)
+
+    def update(self, event_info):
+        super().update(event_info)
+        if game.common.SCORE < self.SPIKE_INTRO_SCORE:
+            return
+
+        if self.spike_gen_time.update():
+            spike_height = 30
+            dir = random.choice(("left", "right"))
+
+            if dir == "left":
+                pos_x = 29
+            else:
+                pos_x = SCREEN_SIZE[0] - (spike_height + 29)
+
+            n_spikes = random.randrange(2, 5)
+
+            for x in range(n_spikes):
+                self.spikes.append(
+                    Spike(
+                        spike_height,
+                        pygame.Vector2(
+                            pos_x, (x * spike_height) - (n_spikes * spike_height)
+                        ),
+                        dir,
+                    )
+                )
+
+        for spike in self.spikes[:]:
+            spike.update(event_info["dt"])
+
+            if not spike.alive:
+                self.spikes.remove(spike)
+
+    def draw(self, screen):
+        super().draw(screen)
+        for spike in self.spikes:
+            spike.draw(screen)
+
+
+class ScoreStage(SpikeStage):
+    SCORE_FONT = pygame.font.SysFont("comicsans", 40)
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.score_vel = 0.1
+        self.score_acc = 0.001
+
+    def update(self, event_info):
+        super().update(event_info)
+        if game.common.SCORE < 150 or game.common.SCORE % 100 == 0:
+            self.score_vel += self.score_acc * event_info["dt"]
+        game.common.SCORE += self.score_vel * event_info["dt"]
+        game.common.UNIVERSAL_SPEEDUP = self.score_vel * 20
+
+    def draw(self, screen):
+        super().draw(screen)
+        score_surf = self.SCORE_FONT.render(f"{game.common.SCORE:.0f}", True, "black")
+        score_rect = score_surf.get_rect()
+        score_rect.center = screen.get_rect().center
+        screen.blit(score_surf, score_rect)
+
+
+class PlayerStage(ScoreStage):
     def update(self, event_info):
         super().update(event_info)
         self.player.handle_input(event_info["events"])
@@ -223,12 +221,12 @@ class PlayerStage(PlatformStage):
         # Handle Player-Platform collision
         self.player.vel = self.player.VEL
         for plat in self.platforms:
-            if self.player.collides(plat) and not self.player.is_space_pressed:
+            if self.player.would_collide(plat, event_info["dt"]) and not self.player.is_space_pressed:
                 self.player.vel = 0
-                # if self.player.pos.x - plat.pos.x > 0:
-                #     self.player.rect.left = plat.rect.left
-                # elif self.player.pos.x - plat.pos.x < 0:
-                #     self.player.rect.right = plat.rect.right
+                if self.player.rect.x > plat.rect.x:
+                    self.player.pos.x = plat.rect.left + plat.size[0]
+                else:
+                    self.player.pos.x = plat.rect.right - self.player.SIZE[0] - plat.size[0]
 
                 break
 

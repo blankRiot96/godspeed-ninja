@@ -40,4 +40,3 @@ class Platform(MovingEntity):
                 screen.blit(self.image, (self.rect.x - 94 + 29, self.rect.y))
         else:
             screen.blit(self.image, self.rect)
-        pygame.draw.rect(screen, "red", self.rect, 2)
