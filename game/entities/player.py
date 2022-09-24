@@ -25,6 +25,7 @@ class Player(CollidableEntity):
         self.sign = 1
         self.vel = self.VEL
         self.is_space_pressed = False
+        self.distance_covered = 0
 
     def handle_input(self, events: Events):
         """
@@ -86,6 +87,8 @@ class Player(CollidableEntity):
         self.rect.topleft = self.pos
 
     def update(self, dt: float):
+        horizontal_speed = 2.5
+        self.distance_covered += horizontal_speed * dt
         self.pos.x += self.vel * dt * self.sign * (game.common.UNIVERSAL_SPEEDUP / 10)
         self.rect.topleft = self.pos
 

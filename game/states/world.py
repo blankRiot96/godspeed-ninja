@@ -1,4 +1,5 @@
 import random
+import colorsys
 
 import pygame
 from pglib.common import EventInfo
@@ -48,14 +49,34 @@ class LoadingScreenStage(WorldInitStage):
             ),
             font=pygame.font.Font(FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20),
             font_color="white",
-            debug_timer=3.0
+            debug_timer=1.5
         )
 
         while self.loading_screen.loading:
             self.loading_screen.update()
             self.loading_screen.draw(pygame.display.get_surface())
 
-class PlatformStage(LoadingScreenStage):
+class BackgroundRenderStage(LoadingScreenStage):
+    def __init__(self) -> None:
+        super().__init__()
+        bg = game.common.assets["bg"]
+        game.common.assets["bg"] = pygame.transform.scale(bg, SCREEN_SIZE)
+        self.uncolored_bg = game.common.assets["bg"].copy()
+
+    def update(self, event_info: EventInfo):
+        super().update(event_info)
+        bg_copy = self.uncolored_bg.copy()
+        tint = ((self.player.distance_covered / 50) % 100) / 100
+        color = colorsys.hsv_to_rgb(tint, 1, 1)
+        bg_copy.fill((color[0]*255, color[1]*255, color[2]*255), special_flags=pygame.BLEND_ADD)
+        game.common.assets["bg"] = bg_copy.copy()
+
+
+    def draw(self, screen: pygame.Surface):
+        super().draw(screen)
+        screen.blit(game.common.assets["bg"], (0, 0))
+
+class PlatformStage(BackgroundRenderStage):
     PLATFORM_INTRO_SCORE = 1000
 
     def __init__(self) -> None:
