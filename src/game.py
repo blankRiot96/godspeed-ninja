@@ -3,10 +3,9 @@ import itertools
 
 import pygame
 
-from game.common import SCREEN_SIZE
-from game.states.enums import States
-from game.states.main_menu import MainMenu
-from game.states.world import World
+from src.common import SCREEN_SIZE
+from src.states.main_menu import MainMenu
+from src.states.world import World
 
 
 class Game:
@@ -71,12 +70,3 @@ class Game:
 
     def run(self) -> None:
         asyncio.run(self._run())
-
-
-def main():
-    game = Game()
-    game.run()
-
-
-if __name__ == "__main__":
-    main()

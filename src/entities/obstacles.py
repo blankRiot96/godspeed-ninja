@@ -1,9 +1,9 @@
 import pygame
 from pglib.common import ColorValue, Pos
 
-import game.common
-from game.entities.abc import MovingEntity
-from game.entities.enums import Entities
+import src.common
+from src.entities.abc import MovingEntity
+from src.entities.enums import Entities
 
 
 def _render_triangle(height: int, color: ColorValue, dir: str) -> pygame.Surface:
@@ -30,7 +30,7 @@ class Spike(MovingEntity):
 
     def update(self, dt: float):
         super().update()
-        self.pos.y += self.vel * dt * game.common.UNIVERSAL_SPEEDUP
+        self.pos.y += self.vel * dt * src.common.UNIVERSAL_SPEEDUP
         self.rect.topleft = self.pos
 
 
@@ -42,7 +42,7 @@ class Shuriken(MovingEntity):
 
     def __init__(self, pos: Pos) -> None:
         if self.once:
-            Shuriken.ORIGINAL_IMAGE = game.common.assets["shuriken"].copy()
+            Shuriken.ORIGINAL_IMAGE = src.common.assets["shuriken"].copy()
             self.once = False
         super().__init__(Shuriken.ORIGINAL_IMAGE.copy(), pos, Entities.SHURIKEN)
         self.angle = 0

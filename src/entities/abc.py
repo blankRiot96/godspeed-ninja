@@ -5,8 +5,8 @@ import pygame
 from pglib.common import Pos, Size
 from typing_extensions import Self
 
-from game.common import SCREEN_SIZE
-from game.entities.enums import Entities
+from src.common import SCREEN_SIZE
+from src.entities.enums import Entities
 
 
 class Entity(abc.ABC):
