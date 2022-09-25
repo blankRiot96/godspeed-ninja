@@ -8,7 +8,7 @@ from godspeed.states.main_menu import MainMenu
 from godspeed.states.world import World
 
 
-class Game:
+class _Game:
     SCREEN_FLAGS = pygame.SCALED
     FPS_CAP = 60
 
@@ -18,9 +18,9 @@ class Game:
         self.states = itertools.cycle((World, MainMenu))
         self.state = World()
 
-        self._is_running = True
+        self.is_running = True
 
-    def _grab_events(self):
+    def grab_events(self):
         """
         Return window events
         """
@@ -41,24 +41,24 @@ class Game:
             "key_press": key_press,
         }
 
-    def _update(self) -> None:
-        event_info = self._grab_events()
+    def update(self) -> None:
+        event_info = self.grab_events()
         for event in event_info["events"]:
             if event.type == pygame.QUIT:
-                self._is_running = False
+                self.is_running = False
 
         self.state.update(event_info)
         if not self.state.alive:
             self.state = next(self.states)()
 
-    def _draw(self) -> None:
+    def draw(self) -> None:
         self.screen.fill("grey")
         self.state.draw(self.screen)
 
-    async def _run(self) -> None:
-        while self._is_running:
-            self._update()
-            self._draw()
+    async def async_run(self) -> None:
+        while self.is_running:
+            self.update()
+            self.draw()
 
             pygame.display.set_caption(
                 f"Godspeed Ninja | {self.clock.get_fps():.0f} FPS"
@@ -69,4 +69,8 @@ class Game:
             await asyncio.sleep(0)
 
     def run(self) -> None:
-        asyncio.run(self._run())
+        asyncio.run(self.async_run())
+
+
+def start_game():
+    _Game().run()
