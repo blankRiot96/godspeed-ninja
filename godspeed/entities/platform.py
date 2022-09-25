@@ -3,10 +3,10 @@ from typing import Optional
 import pygame
 from pglib.common import EventInfo, Pos, Size
 
-import game.common
-from game.common import SCREEN_SIZE
-from game.entities.abc import MovingEntity
-from game.entities.enums import Entities
+import godspeed.common
+from godspeed.common import SCREEN_SIZE
+from godspeed.entities.abc import MovingEntity
+from godspeed.entities.enums import Entities
 
 
 class Platform(MovingEntity):
@@ -26,7 +26,7 @@ class Platform(MovingEntity):
         self.vel = 0.3
 
     def update(self, dt: float):
-        dy = self.vel * dt * game.common.UNIVERSAL_SPEEDUP
+        dy = self.vel * dt * godspeed.common.UNIVERSAL_SPEEDUP
         if self.is_special:
             self.pos.y += dy
             if self.pos.y >= SCREEN_SIZE[1]:
