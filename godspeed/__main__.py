@@ -1,9 +1,8 @@
-from godspeed.game import Game
+from godspeed.game import start_game
 
 
 def main():
-    game = Game()
-    game.run()
+    start_game()
 
 
 if __name__ == "__main__":
