@@ -7,12 +7,12 @@ from pglib.ui.loading_bar import LoadingBar
 from pglib.ui.loading_screen import LoadingScreen
 from pglib.utils.classes import Time
 
-import src.common
-from src.common import FONT_PATH, IMAGE_PATH, SCREEN_SIZE
-from src.entities.enums import Entities
-from src.entities.obstacles import Shuriken, Spike
-from src.entities.platform import Platform
-from src.entities.player import Player
+import godspeed.common
+from godspeed.common import FONT_PATH, IMAGE_PATH, SCREEN_SIZE
+from godspeed.entities.enums import Entities
+from godspeed.entities.obstacles import Shuriken, Spike
+from godspeed.entities.platform import Platform
+from godspeed.entities.player import Player
 
 
 class WorldInitStage:
@@ -37,10 +37,10 @@ class LoadingScreenStage(WorldInitStage):
             IMAGE_PATH / "backgrounds" / "loading_screen.png"
         ).convert()
         loading_screen = pygame.transform.scale(loading_screen, SCREEN_SIZE)
-        src.common.assets |= {"loading_screen": loading_screen}
+        godspeed.common.assets |= {"loading_screen": loading_screen}
         self.loading_screen = LoadingScreen(
             "world",
-            src.common.assets,
+            godspeed.common.assets,
             LoadingBar(
                 "grey",
                 "white",
@@ -61,9 +61,9 @@ class LoadingScreenStage(WorldInitStage):
 class BackgroundRenderStage(LoadingScreenStage):
     def __init__(self) -> None:
         super().__init__()
-        bg = src.common.assets["bg"]
-        src.common.assets["bg"] = pygame.transform.scale(bg, SCREEN_SIZE)
-        self.uncolored_bg = src.common.assets["bg"].copy()
+        bg = godspeed.common.assets["bg"]
+        godspeed.common.assets["bg"] = pygame.transform.scale(bg, SCREEN_SIZE)
+        self.uncolored_bg = godspeed.common.assets["bg"].copy()
 
     def update(self, event_info: EventInfo):
         super().update(event_info)
@@ -74,11 +74,11 @@ class BackgroundRenderStage(LoadingScreenStage):
             (color[0] * 255, color[1] * 255, color[2] * 255),
             special_flags=pygame.BLEND_ADD,
         )
-        src.common.assets["bg"] = bg_copy.copy()
+        godspeed.common.assets["bg"] = bg_copy.copy()
 
     def draw(self, screen: pygame.Surface):
         super().draw(screen)
-        screen.blit(src.common.assets["bg"], (0, 0))
+        screen.blit(godspeed.common.assets["bg"], (0, 0))
 
 
 class PlatformStage(BackgroundRenderStage):
@@ -87,11 +87,11 @@ class PlatformStage(BackgroundRenderStage):
     def __init__(self) -> None:
         super().__init__()
         platform_image_name = "bamboo_{n}"
-        print(src.common.assets)
+        print(godspeed.common.assets)
         n = 1
         for i in range(2):
             for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
-                image: pygame.Surface = src.common.assets[
+                image: pygame.Surface = godspeed.common.assets[
                     platform_image_name.format(n=n)
                 ]
                 image = image.subsurface(image.get_bounding_rect())
@@ -126,7 +126,7 @@ class PlatformStage(BackgroundRenderStage):
         # Everything after this if statement
         # is only for when the player reaches a
         # certain score.
-        if src.common.SCORE < self.PLATFORM_INTRO_SCORE:
+        if godspeed.common.SCORE < self.PLATFORM_INTRO_SCORE:
             return
 
         if self.plat_gen_time.update():
@@ -155,7 +155,7 @@ class ShurikenStage(PlatformStage):
     def update(self, event_info: EventInfo):
         super().update(event_info)
 
-        if src.common.SCORE < self.SHURIKEN_INTRO_SCORE:
+        if godspeed.common.SCORE < self.SHURIKEN_INTRO_SCORE:
             return
 
         if self.shuriken_gen_time.update():
@@ -182,7 +182,7 @@ class SpikeStage(ShurikenStage):
 
     def update(self, event_info):
         super().update(event_info)
-        if src.common.SCORE < self.SPIKE_INTRO_SCORE:
+        if godspeed.common.SCORE < self.SPIKE_INTRO_SCORE:
             return
 
         if self.spike_gen_time.update():
@@ -229,14 +229,14 @@ class ScoreStage(SpikeStage):
 
     def update(self, event_info):
         super().update(event_info)
-        if src.common.SCORE < 150 or src.common.SCORE % 100 == 0:
+        if godspeed.common.SCORE < 150 or godspeed.common.SCORE % 100 == 0:
             self.score_vel += self.score_acc * event_info["dt"]
-        src.common.SCORE += self.score_vel * event_info["dt"]
-        src.common.UNIVERSAL_SPEEDUP = self.score_vel * 20
+        godspeed.common.SCORE += self.score_vel * event_info["dt"]
+        godspeed.common.UNIVERSAL_SPEEDUP = self.score_vel * 20
 
     def draw(self, screen):
         super().draw(screen)
-        score_surf = self.SCORE_FONT.render(f"{src.common.SCORE:.0f}", True, "black")
+        score_surf = self.SCORE_FONT.render(f"{godspeed.common.SCORE:.0f}", True, "black")
         score_rect = score_surf.get_rect()
         score_rect.center = screen.get_rect().center
         screen.blit(score_surf, score_rect)

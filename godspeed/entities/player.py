@@ -2,10 +2,10 @@ import pygame
 from pglib.common import Events
 from typing_extensions import Self
 
-import src.common
-from src.common import SCREEN_SIZE
-from src.entities.abc import CollidableEntity, MovingEntity
-from src.entities.enums import Entities
+import godspeed.common
+from godspeed.common import SCREEN_SIZE
+from godspeed.entities.abc import CollidableEntity, MovingEntity
+from godspeed.entities.enums import Entities
 
 
 class Player(CollidableEntity):
@@ -40,12 +40,12 @@ class Player(CollidableEntity):
 
     def predicted_pos(self, dt: float) -> pygame.Vector2:
         pos = self.pos.copy()
-        pos.x += self.vel * dt * self.sign * (src.common.UNIVERSAL_SPEEDUP / 10)
+        pos.x += self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
 
         return pos
 
     def predicted_move(self, dt: float) -> pygame.Vector2:
-        dx = self.vel * dt * self.sign * (src.common.UNIVERSAL_SPEEDUP / 10)
+        dx = self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
 
         return pygame.Vector2(dx, 0)
 
@@ -85,5 +85,5 @@ class Player(CollidableEntity):
     def update(self, dt: float):
         vertical_speed = 1.3
         self.distance_covered += vertical_speed * dt
-        self.pos.x += self.vel * dt * self.sign * (src.common.UNIVERSAL_SPEEDUP / 10)
+        self.pos.x += self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
         self.rect.topleft = self.pos

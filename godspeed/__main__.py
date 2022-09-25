@@ -1,4 +1,4 @@
-from src.game import Game
+from godspeed.game import Game
 
 
 def main():

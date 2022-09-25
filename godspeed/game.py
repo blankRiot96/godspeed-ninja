@@ -3,9 +3,9 @@ import itertools
 
 import pygame
 
-from src.common import SCREEN_SIZE
-from src.states.main_menu import MainMenu
-from src.states.world import World
+from godspeed.common import SCREEN_SIZE
+from godspeed.states.main_menu import MainMenu
+from godspeed.states.world import World
 
 
 class Game:
