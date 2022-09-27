@@ -3,5 +3,10 @@
         "sprite_sheet": null,
         "convert_alpha": true,
         "states": ["*"]
+    },
+    "spike.png": {
+        "sprite_sheet": null,
+        "convert_alpha": true,
+        "states": ["*"]
     }
 }

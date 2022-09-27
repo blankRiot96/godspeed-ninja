@@ -192,7 +192,7 @@ class SpikeStage(ShurikenStage):
             if dir == "left":
                 pos_x = 29
             else:
-                pos_x = SCREEN_SIZE[0] - (spike_height + 29)
+                pos_x = SCREEN_SIZE[0] - (spike_height + 39)
 
             n_spikes = random.randrange(2, 5)
 
