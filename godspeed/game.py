@@ -46,7 +46,7 @@ class _Game:
             if event.type == pygame.QUIT:
                 self.is_running = False
 
-        self.state_manager.update()
+        self.state_manager.update(event_info)
 
     def draw(self) -> None:
         self.screen.fill("grey")
