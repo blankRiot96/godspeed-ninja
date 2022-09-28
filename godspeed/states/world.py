@@ -232,7 +232,7 @@ class ScoreStage(SpikeStage):
         if godspeed.common.SCORE < 150 or godspeed.common.SCORE % 100 == 0:
             self.score_vel += self.score_acc * event_info["dt"]
         godspeed.common.SCORE += self.score_vel * event_info["dt"]
-        godspeed.common.UNIVERSAL_SPEEDUP = self.score_vel * 20
+        godspeed.common.UNIVERSAL_SPEEDUP = self.score_vel * 20 if self.score_vel else godspeed.common.UNIVERSAL_SPEEDUP
 
     def draw(self, screen):
         super().draw(screen)
@@ -243,15 +243,10 @@ class ScoreStage(SpikeStage):
 
 
 class PlayerStage(ScoreStage):
-    def update(self, event_info):
-        super().update(event_info)
-        self.player.handle_input(event_info["events"])
-
-        # Handle Player-Platform collision
-        self.player.vel = self.player.VEL
+    def handle_player_platform_collision(self, dt: float):
         for plat in self.platforms:
             if (
-                self.player.would_collide(plat, event_info["dt"])
+                self.player.would_collide(plat, dt)
                 and not self.player.is_space_pressed
             ):
                 self.player.vel = 0
@@ -264,7 +259,34 @@ class PlayerStage(ScoreStage):
 
                 break
 
+    def handle_player_spike_collision(self):
+        for spike in self.spikes:
+            if self.player.collides(spike):
+                self.player.alive = False 
+                break
+
+    def update(self, event_info):
+        super().update(event_info)
+        if self.player.alive:
+            self.player.handle_input(event_info["events"])
+
+        # Handle Player collision with other entities
+        self.player.vel = self.player.VEL
+        self.handle_player_platform_collision(event_info["dt"])
+        self.handle_player_spike_collision()
+
+        if not self.player.alive:
+            godspeed.common.UNIVERSAL_SPEEDUP = -(abs(godspeed.common.UNIVERSAL_SPEEDUP))
+            self.score_acc = 0
+            self.score_vel = 0
+        
+        if self.player.pos.x > SCREEN_SIZE[0] or self.player.pos.x + self.player.SIZE[0] < 0:
+            godspeed.common.UNIVERSAL_SPEEDUP = 0
+            self.player.alive = True
+
         self.player.update(event_info["dt"])
+
+
 
     def draw(self, screen):
         super().draw(screen)

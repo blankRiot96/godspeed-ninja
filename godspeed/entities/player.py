@@ -24,6 +24,7 @@ class Player(CollidableEntity):
         self.vel = self.VEL
         self.is_space_pressed = False
         self.distance_covered = 0
+        self.alive = True 
 
     def handle_input(self, events: Events):
         """
@@ -58,17 +59,6 @@ class Player(CollidableEntity):
             self.colliding_with = None
 
         return is_colliding
-
-    # def collides(self, other: MovingEntity, dt: float) -> bool:
-    #     predicted_pos = self.predicted_pos(dt)
-    #     predicted_rect = pygame.Rect(predicted_pos, self.SIZE)
-    #     is_colliding = predicted_rect.colliderect(other.rect)
-    #     if is_colliding:
-    #         self.colliding_with = other.type
-    #     else:
-    #         self.colliding_with = None
-
-    #     return is_colliding, predicted_pos
 
     def move_rect(self, dv: pygame.Vector2) -> None:
         stub = self.rect.copy()
