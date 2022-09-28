@@ -4,8 +4,8 @@ import itertools
 import pygame
 
 from godspeed.common import SCREEN_SIZE
-from godspeed.states.manager import StateManager
 from godspeed.states.enums import States
+from godspeed.states.manager import StateManager
 
 
 class _Game:
