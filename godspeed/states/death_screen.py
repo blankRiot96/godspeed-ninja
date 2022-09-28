@@ -1,0 +1,2 @@
+class DeathScreen:
+    pass
