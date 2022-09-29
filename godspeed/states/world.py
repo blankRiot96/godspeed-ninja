@@ -1,5 +1,6 @@
 import colorsys
 import random
+from typing import Optional
 
 import pygame
 from pglib.common import EventInfo
@@ -14,14 +15,19 @@ from godspeed.entities.obstacles import Shuriken, Spike
 from godspeed.entities.platform import Platform
 from godspeed.entities.player import Player
 
+from godspeed.states.enums import States
+from godspeed.states.abc import GameState
 
-class WorldInitStage:
+
+class WorldInitStage(GameState):
     def __init__(self) -> None:
         self.player = Player()
         self.platforms: list[Platform] = []
         self.spikes: list[Spike] = []
         self.shurikens: list[Shuriken] = []
-        self.alive = True
+
+        # Game state config
+        self.state_switch = False
 
     def update(self, event_info: EventInfo):
         pass
@@ -288,14 +294,17 @@ class PlayerStage(ScoreStage):
             or self.player.pos.x + self.player.SIZE[0] < 0
         ):
             godspeed.common.UNIVERSAL_SPEEDUP = 0
-            self.player.alive = True
+            self.alive = False
+            self.next_state = States.DEATH_SCREEN
+            self.state_switch = True
 
         self.player.update(event_info["dt"])
 
     def draw(self, screen):
         super().draw(screen)
         self.player.draw(screen)
+        self.shared_data["last_screen"] = screen.copy()
 
 
 class World(PlayerStage):
-    pass
+    """World class which handles all world related events in the game."""
