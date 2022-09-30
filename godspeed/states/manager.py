@@ -26,9 +26,8 @@ class StateManager:
 
     def get_state_instance(self) -> Any:
         state_type = self.states[self.current_state.value - 1]
-        inst = state_type()
 
-        return inst
+        return state_type()
 
     def handle_state_switching(self) -> None:
         self.shared_data[self.current_state] = self.state.shared_data.copy()
@@ -39,7 +38,7 @@ class StateManager:
     def update(self, event_info: EventInfo) -> None:
         self.state.update(event_info)
 
-        if not self.state.alive:
+        if not self.state.active:
             self.handle_state_switching()
 
     def draw(self, screen: pygame.Surface) -> None:

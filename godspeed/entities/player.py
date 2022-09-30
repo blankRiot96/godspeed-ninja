@@ -41,12 +41,12 @@ class Player(CollidableEntity):
 
     def predicted_pos(self, dt: float) -> pygame.Vector2:
         pos = self.pos.copy()
-        pos.x += self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
+        pos.x += self.vel * dt * self.sign * (godspeed.common.universal_speedup / 10)
 
         return pos
 
     def predicted_move(self, dt: float) -> pygame.Vector2:
-        dx = self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
+        dx = self.vel * dt * self.sign * (godspeed.common.universal_speedup / 10)
 
         return pygame.Vector2(dx, 0)
 
@@ -76,6 +76,6 @@ class Player(CollidableEntity):
         vertical_speed = 1.3
         self.distance_covered += vertical_speed * dt
         self.pos.x += (
-            self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
+            self.vel * dt * self.sign * (godspeed.common.universal_speedup / 10)
         )
         self.rect.topleft = self.pos

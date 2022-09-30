@@ -4,15 +4,14 @@ from pglib.ui.buttons import Button
 from pglib.utils import font
 
 import godspeed.common
-from godspeed.common import FONT_PATH, SCREEN_RECT, SCREEN_SIZE
+from godspeed.common import IBM_FONTS_PATHS, SCREEN_RECT, SCREEN_SIZE
 from godspeed.states.abc import GameState
 from godspeed.states.enums import States
 
 
 def create_fading_overlay() -> FadingImage:
-    surf = pygame.Surface(SCREEN_SIZE)
     return FadingImage(
-        image=surf,
+        image=pygame.Surface(SCREEN_SIZE),
         speed=3,
         duration=1,
         pos=(0, 0),
@@ -20,7 +19,7 @@ def create_fading_overlay() -> FadingImage:
 
 
 def create_retry_button() -> Button:
-    font_name = FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Bold.ttf"
+    font_name = IBM_FONTS_PATHS["bold"]
     rect = pygame.Rect((0, 0), (170, 50))
     rect.center = SCREEN_RECT.center
     return Button(
@@ -35,7 +34,6 @@ def create_retry_button() -> Button:
 
 class DeathInitStage:
     def __init__(self) -> None:
-        super().__init__()
         self.transition_overlay = create_fading_overlay()
 
     def update(self, event_info):
@@ -62,9 +60,8 @@ class RenderBackgroundStage(DeathInitStage):
 
 
 class RenderInfo(RenderBackgroundStage):
-    SCORE_FONT = font(
-        size=40, name=FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Bold.ttf"
-    )
+    SCORE_FONT = font(size=40, name=IBM_FONTS_PATHS["bold"])
+    SCORE_FACTOR = 1.3
 
     def __init__(self) -> None:
         super().__init__()
@@ -73,16 +70,16 @@ class RenderInfo(RenderBackgroundStage):
 
     def update(self, event_info):
         super().update(event_info)
-        self.anim_score += 1.3 * event_info["dt"]
-        if self.anim_score > godspeed.common.SCORE:
-            self.anim_score = godspeed.common.SCORE
+        self.anim_score += self.SCORE_FACTOR * event_info["dt"]
+        if self.anim_score > godspeed.common.score:
+            self.anim_score = godspeed.common.score
 
         self.retry_button.update(event_info["mouse_pos"], event_info["mouse_press"])
         if self.retry_button.clicked:
             self.end()
 
     def end(self) -> None:
-        self.alive = False
+        self.active = False
         self.next_state = States.WORLD
 
     def draw_score(self, screen):
