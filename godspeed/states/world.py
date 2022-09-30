@@ -7,6 +7,7 @@ from pglib.common import EventInfo
 from pglib.ui.loading_bar import LoadingBar
 from pglib.ui.loading_screen import LoadingScreen
 from pglib.utils.classes import Time
+from pglib.utils import font
 
 import godspeed.common
 from godspeed.common import FONT_PATH, IMAGE_PATH, SCREEN_SIZE
@@ -19,8 +20,9 @@ from godspeed.states.enums import States
 from godspeed.states.abc import GameState
 
 
-class WorldInitStage(GameState):
+class WorldInitStage:
     def __init__(self) -> None:
+        super().__init__()
         self.player = Player()
         self.platforms: list[Platform] = []
         self.spikes: list[Spike] = []
@@ -28,6 +30,7 @@ class WorldInitStage(GameState):
 
         # Game state config
         self.state_switch = False
+        godspeed.common.SCORE = 0
 
     def update(self, event_info: EventInfo):
         pass
@@ -52,8 +55,8 @@ class LoadingScreenStage(WorldInitStage):
                 "white",
                 pygame.Rect((0, SCREEN_SIZE[1] - 20), (SCREEN_SIZE[0], 20)),
             ),
-            font=pygame.font.Font(
-                FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20
+            font=font(
+                name=FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf"
             ),
             font_color="white",
             debug_timer=0.1,
@@ -93,7 +96,6 @@ class PlatformStage(BackgroundRenderStage):
     def __init__(self) -> None:
         super().__init__()
         platform_image_name = "bamboo_{n}"
-        print(godspeed.common.assets)
         n = 1
         for i in range(2):
             for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
@@ -232,6 +234,7 @@ class ScoreStage(SpikeStage):
         super().__init__()
         self.score_vel = 0.1
         self.score_acc = 0.001
+        print('hapen')
 
     def update(self, event_info):
         super().update(event_info)
@@ -294,17 +297,24 @@ class PlayerStage(ScoreStage):
             or self.player.pos.x + self.player.SIZE[0] < 0
         ):
             godspeed.common.UNIVERSAL_SPEEDUP = 0
-            self.alive = False
-            self.next_state = States.DEATH_SCREEN
             self.state_switch = True
 
         self.player.update(event_info["dt"])
 
+    def end(self) -> None:
+        self.alive = False
+        self.next_state = States.DEATH_SCREEN
+
     def draw(self, screen):
         super().draw(screen)
         self.player.draw(screen)
-        self.shared_data["last_screen"] = screen.copy()
+        if self.state_switch:
+            self.shared_data["last_screen"] = screen.copy()
+            self.end()
 
 
-class World(PlayerStage):
+class World(GameState, PlayerStage):
     """World class which handles all world related events in the game."""
+    def __init__(self) -> None:
+        super().__init__()
+

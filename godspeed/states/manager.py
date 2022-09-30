@@ -32,9 +32,10 @@ class StateManager:
         return inst
 
     def handle_state_switching(self) -> None:
-        self.shared_data[self.state.next_state] = self.state.shared_data.copy()
+        self.shared_data[self.current_state] = self.state.shared_data.copy()
         self.current_state = self.state.next_state
         self.state = self.get_state_instance()
+        self.state.receive_data = self.shared_data
 
     def update(self, event_info: EventInfo) -> None:
         self.state.update(event_info)

@@ -1,6 +1,8 @@
+import pygame
 import pathlib
 
 SCREEN_SIZE = 400, 670
+SCREEN_RECT = pygame.Rect(0, 0, *SCREEN_SIZE)
 SCORE = 0
 UNIVERSAL_SPEEDUP = 1
 assets = {}
