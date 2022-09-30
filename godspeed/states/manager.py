@@ -1,5 +1,4 @@
 from typing import Any
-from xml.dom.pulldom import default_bufsize
 
 import pygame
 from pglib.common import EventInfo
