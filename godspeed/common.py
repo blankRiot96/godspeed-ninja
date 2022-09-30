@@ -1,5 +1,6 @@
-import pygame
 import pathlib
+
+import pygame
 
 SCREEN_SIZE = 400, 670
 SCREEN_RECT = pygame.Rect(0, 0, *SCREEN_SIZE)

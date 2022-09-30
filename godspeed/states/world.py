@@ -6,8 +6,8 @@ import pygame
 from pglib.common import EventInfo
 from pglib.ui.loading_bar import LoadingBar
 from pglib.ui.loading_screen import LoadingScreen
-from pglib.utils.classes import Time
 from pglib.utils import font
+from pglib.utils.classes import Time
 
 import godspeed.common
 from godspeed.common import FONT_PATH, IMAGE_PATH, SCREEN_SIZE
@@ -15,9 +15,8 @@ from godspeed.entities.enums import Entities
 from godspeed.entities.obstacles import Shuriken, Spike
 from godspeed.entities.platform import Platform
 from godspeed.entities.player import Player
-
-from godspeed.states.enums import States
 from godspeed.states.abc import GameState
+from godspeed.states.enums import States
 
 
 class WorldInitStage:
@@ -55,9 +54,7 @@ class LoadingScreenStage(WorldInitStage):
                 "white",
                 pygame.Rect((0, SCREEN_SIZE[1] - 20), (SCREEN_SIZE[0], 20)),
             ),
-            font=font(
-                name=FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf"
-            ),
+            font=font(name=FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf"),
             font_color="white",
             debug_timer=0.1,
         )
@@ -234,7 +231,7 @@ class ScoreStage(SpikeStage):
         super().__init__()
         self.score_vel = 0.1
         self.score_acc = 0.001
-        print('hapen')
+        print("hapen")
 
     def update(self, event_info):
         super().update(event_info)
@@ -315,6 +312,6 @@ class PlayerStage(ScoreStage):
 
 class World(GameState, PlayerStage):
     """World class which handles all world related events in the game."""
+
     def __init__(self) -> None:
         super().__init__()
-
