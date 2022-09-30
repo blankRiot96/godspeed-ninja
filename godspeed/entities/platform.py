@@ -26,7 +26,7 @@ class Platform(MovingEntity):
         self.vel = 0.3
 
     def update(self, dt: float):
-        dy = self.vel * dt * godspeed.common.UNIVERSAL_SPEEDUP
+        dy = self.vel * dt * godspeed.common.universal_speedup
         if self.is_special:
             self.pos.y += dy
             if self.pos.y >= SCREEN_SIZE[1]:

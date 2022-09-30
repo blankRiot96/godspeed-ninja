@@ -24,6 +24,7 @@ class Player(CollidableEntity):
         self.vel = self.VEL
         self.is_space_pressed = False
         self.distance_covered = 0
+        self.alive = True
 
     def handle_input(self, events: Events):
         """
@@ -40,12 +41,12 @@ class Player(CollidableEntity):
 
     def predicted_pos(self, dt: float) -> pygame.Vector2:
         pos = self.pos.copy()
-        pos.x += self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
+        pos.x += self.vel * dt * self.sign * (godspeed.common.universal_speedup / 10)
 
         return pos
 
     def predicted_move(self, dt: float) -> pygame.Vector2:
-        dx = self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
+        dx = self.vel * dt * self.sign * (godspeed.common.universal_speedup / 10)
 
         return pygame.Vector2(dx, 0)
 
@@ -58,17 +59,6 @@ class Player(CollidableEntity):
             self.colliding_with = None
 
         return is_colliding
-
-    # def collides(self, other: MovingEntity, dt: float) -> bool:
-    #     predicted_pos = self.predicted_pos(dt)
-    #     predicted_rect = pygame.Rect(predicted_pos, self.SIZE)
-    #     is_colliding = predicted_rect.colliderect(other.rect)
-    #     if is_colliding:
-    #         self.colliding_with = other.type
-    #     else:
-    #         self.colliding_with = None
-
-    #     return is_colliding, predicted_pos
 
     def move_rect(self, dv: pygame.Vector2) -> None:
         stub = self.rect.copy()
@@ -85,5 +75,7 @@ class Player(CollidableEntity):
     def update(self, dt: float):
         vertical_speed = 1.3
         self.distance_covered += vertical_speed * dt
-        self.pos.x += self.vel * dt * self.sign * (godspeed.common.UNIVERSAL_SPEEDUP / 10)
+        self.pos.x += (
+            self.vel * dt * self.sign * (godspeed.common.universal_speedup / 10)
+        )
         self.rect.topleft = self.pos

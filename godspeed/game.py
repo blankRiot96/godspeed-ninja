@@ -4,8 +4,8 @@ import itertools
 import pygame
 
 from godspeed.common import SCREEN_SIZE
-from godspeed.states.main_menu import MainMenu
-from godspeed.states.world import World
+from godspeed.states.enums import States
+from godspeed.states.manager import StateManager
 
 
 class _Game:
@@ -15,8 +15,7 @@ class _Game:
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(SCREEN_SIZE, self.SCREEN_FLAGS)
         self.clock = pygame.time.Clock()
-        self.states = itertools.cycle((World, MainMenu))
-        self.state = World()
+        self.state_manager = StateManager(States.WORLD)
 
         self.is_running = True
 
@@ -47,13 +46,11 @@ class _Game:
             if event.type == pygame.QUIT:
                 self.is_running = False
 
-        self.state.update(event_info)
-        if not self.state.alive:
-            self.state = next(self.states)()
+        self.state_manager.update(event_info)
 
     def draw(self) -> None:
         self.screen.fill("grey")
-        self.state.draw(self.screen)
+        self.state_manager.draw(self.screen)
 
     async def async_run(self) -> None:
         while self.is_running:

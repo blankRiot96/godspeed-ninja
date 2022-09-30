@@ -1,10 +1,12 @@
 import colorsys
 import random
+from typing import Optional
 
 import pygame
 from pglib.common import EventInfo
 from pglib.ui.loading_bar import LoadingBar
 from pglib.ui.loading_screen import LoadingScreen
+from pglib.utils import font
 from pglib.utils.classes import Time
 
 import godspeed.common
@@ -13,6 +15,8 @@ from godspeed.entities.enums import Entities
 from godspeed.entities.obstacles import Shuriken, Spike
 from godspeed.entities.platform import Platform
 from godspeed.entities.player import Player
+from godspeed.states.abc import GameState
+from godspeed.states.enums import States
 
 
 class WorldInitStage:
@@ -21,7 +25,10 @@ class WorldInitStage:
         self.platforms: list[Platform] = []
         self.spikes: list[Spike] = []
         self.shurikens: list[Shuriken] = []
-        self.alive = True
+
+        # Game state config
+        self.state_switch = False
+        godspeed.common.score = 0
 
     def update(self, event_info: EventInfo):
         pass
@@ -46,9 +53,7 @@ class LoadingScreenStage(WorldInitStage):
                 "white",
                 pygame.Rect((0, SCREEN_SIZE[1] - 20), (SCREEN_SIZE[0], 20)),
             ),
-            font=pygame.font.Font(
-                FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf", 20
-            ),
+            font=font(name=FONT_PATH / "IBM_Plex_Sans" / "IBMPlexSans-Light.ttf"),
             font_color="white",
             debug_timer=0.1,
         )
@@ -87,7 +92,6 @@ class PlatformStage(BackgroundRenderStage):
     def __init__(self) -> None:
         super().__init__()
         platform_image_name = "bamboo_{n}"
-        print(godspeed.common.assets)
         n = 1
         for i in range(2):
             for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
@@ -126,7 +130,7 @@ class PlatformStage(BackgroundRenderStage):
         # Everything after this if statement
         # is only for when the player reaches a
         # certain score.
-        if godspeed.common.SCORE < self.PLATFORM_INTRO_SCORE:
+        if godspeed.common.score < self.PLATFORM_INTRO_SCORE:
             return
 
         if self.plat_gen_time.update():
@@ -155,7 +159,7 @@ class ShurikenStage(PlatformStage):
     def update(self, event_info: EventInfo):
         super().update(event_info)
 
-        if godspeed.common.SCORE < self.SHURIKEN_INTRO_SCORE:
+        if godspeed.common.score < self.SHURIKEN_INTRO_SCORE:
             return
 
         if self.shuriken_gen_time.update():
@@ -182,7 +186,7 @@ class SpikeStage(ShurikenStage):
 
     def update(self, event_info):
         super().update(event_info)
-        if godspeed.common.SCORE < self.SPIKE_INTRO_SCORE:
+        if godspeed.common.score < self.SPIKE_INTRO_SCORE:
             return
 
         if self.spike_gen_time.update():
@@ -221,6 +225,7 @@ class SpikeStage(ShurikenStage):
 
 class ScoreStage(SpikeStage):
     SCORE_FONT = pygame.font.SysFont("comicsans", 40)
+    SCORE_FACTOR = 20
 
     def __init__(self) -> None:
         super().__init__()
@@ -229,31 +234,29 @@ class ScoreStage(SpikeStage):
 
     def update(self, event_info):
         super().update(event_info)
-        if godspeed.common.SCORE < 150 or godspeed.common.SCORE % 100 == 0:
+        if godspeed.common.score < 150 or godspeed.common.score % 100 == 0:
             self.score_vel += self.score_acc * event_info["dt"]
-        godspeed.common.SCORE += self.score_vel * event_info["dt"]
-        godspeed.common.UNIVERSAL_SPEEDUP = self.score_vel * 20
+        godspeed.common.score += self.score_vel * event_info["dt"]
+        godspeed.common.universal_speedup = (
+            self.score_vel * self.SCORE_FACTOR
+            if self.score_vel
+            else godspeed.common.universal_speedup
+        )
 
     def draw(self, screen):
         super().draw(screen)
-        score_surf = self.SCORE_FONT.render(f"{godspeed.common.SCORE:.0f}", True, "black")
+        score_surf = self.SCORE_FONT.render(
+            f"{godspeed.common.score:.0f}", True, "black"
+        )
         score_rect = score_surf.get_rect()
         score_rect.center = screen.get_rect().center
         screen.blit(score_surf, score_rect)
 
 
 class PlayerStage(ScoreStage):
-    def update(self, event_info):
-        super().update(event_info)
-        self.player.handle_input(event_info["events"])
-
-        # Handle Player-Platform collision
-        self.player.vel = self.player.VEL
+    def handle_player_platform_collision(self, dt: float):
         for plat in self.platforms:
-            if (
-                self.player.would_collide(plat, event_info["dt"])
-                and not self.player.is_space_pressed
-            ):
+            if self.player.would_collide(plat, dt) and not self.player.is_space_pressed:
                 self.player.vel = 0
                 if self.player.rect.x > plat.rect.x:
                     self.player.pos.x = plat.rect.left + plat.size[0]
@@ -264,12 +267,52 @@ class PlayerStage(ScoreStage):
 
                 break
 
+    def handle_player_spike_collision(self):
+        for spike in self.spikes:
+            if self.player.collides(spike):
+                self.player.alive = False
+                break
+
+    def update(self, event_info):
+        super().update(event_info)
+        if self.player.alive:
+            self.player.handle_input(event_info["events"])
+
+        # Handle Player collision with other entities
+        self.player.vel = self.player.VEL
+        self.handle_player_platform_collision(event_info["dt"])
+        self.handle_player_spike_collision()
+
+        if not self.player.alive:
+            godspeed.common.universal_speedup = -(
+                abs(godspeed.common.universal_speedup)
+            )
+            self.score_acc = 0
+            self.score_vel = 0
+
+        if (
+            self.player.pos.x > SCREEN_SIZE[0]
+            or self.player.pos.x + self.player.SIZE[0] < 0
+        ):
+            godspeed.common.universal_speedup = 0
+            self.state_switch = True
+
         self.player.update(event_info["dt"])
+
+    def end(self) -> None:
+        self.active = False
+        self.next_state = States.DEATH_SCREEN
 
     def draw(self, screen):
         super().draw(screen)
         self.player.draw(screen)
+        if self.state_switch:
+            self.shared_data["last_screen"] = screen.copy()
+            self.end()
 
 
-class World(PlayerStage):
-    pass
+class World(GameState, PlayerStage):
+    """World class which handles all world related events in the game."""
+
+    def __init__(self) -> None:
+        super().__init__()

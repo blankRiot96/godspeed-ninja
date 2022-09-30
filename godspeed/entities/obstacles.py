@@ -47,7 +47,7 @@ class Spike(MovingEntity):
 
     def update(self, dt: float):
         super().update()
-        self.pos.y += self.vel * dt * godspeed.common.UNIVERSAL_SPEEDUP
+        self.pos.y += self.vel * dt * godspeed.common.universal_speedup
         self.rect.topleft = self.pos
 
 
