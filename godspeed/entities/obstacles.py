@@ -24,9 +24,26 @@ def _render_triangle(height: int, color: ColorValue, dir: str) -> pygame.Surface
 
 class Spike(MovingEntity):
     def __init__(self, height: int, pos: Pos, dir: str) -> None:
-        image = _render_triangle(height, "purple", dir)
-        super().__init__(image, pos, Entities.SPIKE)
+        self.height = height
+        self.dir = dir 
+        super().__init__(self.gen_image(), pos, Entities.SPIKE)
         self.vel = 0.5
+
+    def gen_image(self) -> pygame.Surface:
+        s = 1 if self.dir == "right" else -1
+        image = _render_triangle(self.height + 10, "black", self.dir)
+        fore_image = pygame.transform.scale(godspeed.common.assets["spike"], (self.height, self.height))
+        if self.dir == "right":
+            fore_image = pygame.transform.rotate(fore_image, 90)
+        elif self.dir == "left":
+            fore_image = pygame.transform.rotate(fore_image, -90)
+        else:
+            raise ValueError("Invalid value given for Spike.dir, should be right or left.")
+        
+        r = image.get_rect()
+        image.blit(fore_image, fore_image.get_rect(center=(r.centerx + (2 * s), r.centery)))
+        return image 
+
 
     def update(self, dt: float):
         super().update()
