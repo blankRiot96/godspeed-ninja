@@ -57,6 +57,8 @@ class MovingEntity(CollidableEntity):
         size: Optional[Size] = None,
     ) -> None:
         super().__init__(image, pos, type, size)
+        if not isinstance(self.pos, pygame.Vector2):
+            self.pos = pygame.Vector2(self.pos)
         self.alive = True
 
     def update(self):

@@ -13,7 +13,7 @@ import godspeed.common
 from godspeed.common import FONT_PATH, IMAGE_PATH, SCREEN_SIZE
 from godspeed.entities.enums import Entities
 from godspeed.entities.obstacles import Shuriken, Spike
-from godspeed.entities.platform import Platform
+from godspeed.entities.platform import Platform, create_side_platforms
 from godspeed.entities.player import Player
 from godspeed.states.abc import GameState
 from godspeed.states.enums import States
@@ -91,31 +91,7 @@ class PlatformStage(BackgroundRenderStage):
 
     def __init__(self) -> None:
         super().__init__()
-        platform_image_name = "bamboo_{n}"
-        n = 1
-        for i in range(2):
-            for row in 0, SCREEN_SIZE[0] - self.player.SIZE[0]:
-                image: pygame.Surface = godspeed.common.assets[
-                    platform_image_name.format(n=n)
-                ]
-                image = image.subsurface(image.get_bounding_rect())
-                size = (29, SCREEN_SIZE[1])
-                image = pygame.transform.scale(image, (size[0] + 64, size[1]))
-                if row != 0:
-                    image = pygame.transform.flip(image, True, False)
-
-                self.platforms.append(
-                    Platform(
-                        image,
-                        pygame.Vector2(
-                            row if row == 0 else row + 20, 0 - (i * SCREEN_SIZE[1])
-                        ),
-                        Entities.PLATFORM,
-                        size=size,
-                        special=True,
-                    )
-                )
-                n *= -1
+        self.platforms.extend(create_side_platforms())
         self.plat_gen_time = Time(5)
 
     def update(self, event_info):

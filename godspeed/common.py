@@ -20,3 +20,6 @@ IBM_FONTS_PATHS = {
     "extra_light": IBM_TTF_FORMAT.format("ExtraLight"),
     "bold": IBM_TTF_FORMAT.format("Bold"),
 }
+
+# OTHERS
+PLAT_WIDTH = 30
